@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Schools {
+  id         Int       @id @default(autoincrement())
+  seq        String
+  schoolName String
+  yearMonth  String
+  userId     Int       @map("user_id")
+  useYn      String    @default("Y")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now())
+  
+  users      Users     @relation(fields: [userId], references: [id])
+  students   Students[]
+
+  @@map("schools")
+}
+
+model Students {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  birthDate   String?  @db.VarChar(10)    // Date 대신 String으로 변경
+  phoneNumber String?  @db.VarChar(20)
+  gender      String?  @db.VarChar(10)
+  schoolId    Int
+  useYn       String   @default("Y") @db.Char(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  school      Schools  @relation(fields: [schoolId], references: [id])
+
+
+  @@index([name])
+  @@map("students")
+}
+
+model Users {
+  id          Int      @id @default(autoincrement())
+  loginId     String   @unique @db.VarChar(50)    // 로그인 ID
+  password    String   @db.VarChar(100)           // 비밀번호 필드 추가
+  name        String   @db.VarChar(50)
+  phoneNumber String?  @db.VarChar(20)
+  email       String   @unique @db.VarChar(100)
+  useYn       String   @default("Y") @db.Char(1)
+  createdAt   DateTime @default(now()) @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
+  schools     Schools[]
+
+  @@index([name])
+  @@index([phoneNumber])
+  @@map("users")
+}
+
+model Sales {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  customer  String
+  email     String
+  createdAt DateTime @default(now()) @updatedAt
+}
+
+model Revenue {
+  id        Int      @id @default(autoincrement())
+  month     String
+  amount    Float
+  createdAt DateTime @default(now()) @updatedAt
+}
