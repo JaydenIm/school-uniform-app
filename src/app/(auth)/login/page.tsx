@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -34,7 +35,7 @@ const LoginPage = () => {
       if (result?.ok) {
         // 세션이 완전히 설정될 때까지 잠시 대기
         await new Promise((resolve) => setTimeout(resolve, 500));
-        router.replace('/dashboard');
+        window.location.href = '/dashboard';
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -99,6 +100,15 @@ const LoginPage = () => {
               {isLoading ? '로그인 중...' : '로그인'}
             </Button>
           </form>
+
+          <div className="text-center">
+            <p className="text-sm text-gray-500">
+              계정이 없으신가요?{' '}
+              <Link href="/signup" className="text-black hover:underline font-semibold">
+                회원가입
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

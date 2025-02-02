@@ -1,15 +1,21 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function LeftMenu() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <div className="w-64 bg-black text-white p-6 fixed h-full">
+      <button
+        onClick={() => router.push('/dashboard')}
+        className="text-xl font-bold mb-8 hover:text-gray-300"
+      >
+        School Uniform
+      </button>
       <div className="space-y-4">
-        <h2 className="text-xl font-bold">School Uniform</h2>
         <nav className="space-y-2">
           <Link 
             href="/dashboard" 

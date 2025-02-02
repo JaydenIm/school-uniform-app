@@ -1,12 +1,13 @@
-import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { Inter } from "next/font/google";
+import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function LoginLayout({
+export default function AuthLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="ko">

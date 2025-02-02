@@ -77,3 +77,11 @@ model Revenue {
   amount    Float
   createdAt DateTime @default(now()) @updatedAt
 }
+
+model Board {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+}

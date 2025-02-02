@@ -58,6 +58,7 @@ export default function ProfilePage() {
       }
 
       toast.success('프로필이 성공적으로 수정되었습니다.');
+      window.location.href = '/dashboard';  // 대시보드로 이동
     } catch (error: any) {
       toast.error(error.message);
     } finally {

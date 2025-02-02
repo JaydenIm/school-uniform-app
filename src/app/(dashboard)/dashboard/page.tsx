@@ -46,26 +46,45 @@ const sidebarNavItems = [
   },
 ]
 
+interface Board {
+  id: number;
+  title: string;
+  createdAt: string;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [isLoading, setIsLoading] = useState(true);
+  const [boards, setBoards] = useState<Board[]>([]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/login');
     } else if (status === 'authenticated') {
-      setIsLoading(false);
       // 첫 방문 체크
       const hasVisited = localStorage.getItem('hasVisitedDashboard');
       if (!hasVisited && session?.user?.name) {
         toast.success(`환영합니다, ${session.user.name}님!`);
         localStorage.setItem('hasVisitedDashboard', 'true');
       }
+
+      // 게시판 데이터 로드
+      const fetchBoards = async () => {
+        try {
+          const response = await fetch('/api/boards');
+          if (!response.ok) throw new Error('Failed to fetch boards');
+          const data = await response.json();
+          setBoards(data.slice(0, 5));
+        } catch (error) {
+          console.error('Error fetching boards:', error);
+        }
+      };
+
+      fetchBoards();
     }
   }, [status, session, router]);
 
-  if (isLoading || status === 'loading') {
+  if (status === 'loading') {
     return (
       <div className="flex items-center justify-center h-screen">
         <div>Loading...</div>
@@ -78,10 +97,46 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-4">환영합니다!</h2>
-        <p>현재 로그인된 사용자: {session?.user?.name}</p>
-      </div>
+      
+        <div className="grid gap-4">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">최근 게시글</h2>
+              <div className="space-y-2">
+                {boards.length > 0 ? (
+                  <div className="space-y-2">
+                    {boards.map(board => (
+                      <div key={board.id} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded">
+                        <span className="text-gray-700 truncate flex-1">{board.title}</span>
+                        <span className="text-gray-500 ml-4">
+                          {new Date(board.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600">등록된 게시글이 없습니다.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="font-medium mb-4">최근 활동</h3>
+              <p className="text-gray-600">아직 활동 내역이 없습니다.</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="font-medium mb-4">통계</h3>
+              <p className="text-gray-600">데이터를 불러오는 중...</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="font-medium mb-4">알림</h3>
+              <p className="text-gray-600">새로운 알림이 없습니다.</p>
+            </div>
+          </div>
+        </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
