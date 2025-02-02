@@ -38,6 +38,12 @@ export default function SchoolsPage() {
   }, []);
 
   useEffect(() => {
+    if (schools.length > 0 && !selectedSchoolId) {
+      setSelectedSchoolId(schools[0].id);
+    }
+  }, [schools, selectedSchoolId]);
+
+  useEffect(() => {
     if (selectedSchoolId && tableRef.current) {
       initTabulator();
       fetchStudents(selectedSchoolId);

@@ -1,32 +1,36 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+'use client';
+
+import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import { Inter } from "next/font/google";
+import { LeftMenu } from "@/components/ui/left-menu";
+import { AccountMenu } from "@/components/ui/account-menu";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <div className="flex h-screen">
-          {session && (  // 로그인된 경우에만 left menu 표시
-            <div className="w-64 bg-black text-white p-6">
-              {/* Left Menu 내용 */}
-            </div>
-          )}
-          <main className={`flex-1 ${session ? 'ml-64' : ''}`}>
-            {children}
-          </main>
-        </div>
-        <Toaster />
+        <SessionProvider>
+          <div className="flex h-screen">
+            <LeftMenu />
+            <main className="flex-1 ml-64">
+              <div className="p-4 border-b flex justify-end">
+                <AccountMenu />
+              </div>
+              <div className="p-6">
+                {children}
+              </div>
+            </main>
+          </div>
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   );

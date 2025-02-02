@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -20,16 +21,14 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || '로그인에 실패했습니다.');
+      if (result?.error) {
+        throw new Error(result.error);
       }
 
       router.push('/dashboard');

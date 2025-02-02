@@ -1,6 +1,28 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db";
+import { JWT } from "next-auth/jwt"
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+    } & DefaultSession["user"]
+  }
+  interface User {
+    id: string;
+    email: string;
+    name: string;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    email: string;
+    name: string;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -26,9 +48,21 @@ export const authOptions: NextAuthOptions = {
           throw new Error('등록되지 않은 이메일 주소입니다.');
         }
 
+        // 패스워드 검증 (현재는 plain text 비교)
         if (user.password !== credentials.password) {
-          throw new Error('비밀번호가 일치하지 않습니다.');
+            throw new Error('비밀번호가 일치하지 않습니다.');
         }
+  
+         /* 나중에 bcrypt 사용 시 아래 코드로 변경
+          const isValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+          
+          if (!isValid) {
+            throw new Error('비밀번호가 일치하지 않습니다.');
+          }
+          */
 
         return {
           id: String(user.id),
@@ -54,7 +88,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (session.user && token) {
         session.user.id = token.id;
         session.user.email = token.email;
         session.user.name = token.name;
