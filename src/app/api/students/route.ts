@@ -46,4 +46,46 @@ export async function POST(request: Request) {
         message: '학생 등록 중 오류가 발생했습니다.' 
       }, { status: 500 })
     }
-  } 
+  }
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const schoolId = searchParams.get('schoolId')
+
+    if (!schoolId) {
+      return NextResponse.json(
+        { success: false, message: '학교 ID가 필요합니다.' },
+        { status: 400 }
+      )
+    }
+
+    const students = await prisma.students.findMany({
+      where: {
+        schoolId: Number(schoolId),
+        useYn: 'Y'
+      },
+      orderBy: {
+        name: 'asc'
+      },
+      select: {
+        id: true,
+        name: true,
+        birthDate: true,
+        phoneNumber: true
+      }
+    })
+
+    return NextResponse.json({ 
+      success: true, 
+      data: students 
+    })
+
+  } catch (error) {
+    console.error('Students fetch error:', error)
+    return NextResponse.json(
+      { success: false, message: '학생 목록 조회에 실패했습니다.' },
+      { status: 500 }
+    )
+  }
+} 

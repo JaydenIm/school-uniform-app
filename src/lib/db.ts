@@ -27,22 +27,35 @@ prisma.$on('query' as never, (e: Prisma.QueryEvent) => {
       return isNaN(param as any) ? `'${param}'` : param
     })
     
+    // SQL 쿼리 포맷팅
     const formattedQuery = query
       .replace(/LIMIT \?/g, () => `LIMIT ${paramsArray[queryIndex - 1]}`)
       .replace(/OFFSET \?/g, () => `OFFSET ${paramsArray[queryIndex - 1]}`)
+      .replace(/SELECT/g, '\nSELECT')
+      .replace(/FROM/g, '\nFROM')
+      .replace(/WHERE/g, '\nWHERE')
+      .replace(/ORDER BY/g, '\nORDER BY')
+      .replace(/GROUP BY/g, '\nGROUP BY')
+      .replace(/HAVING/g, '\nHAVING')
+      .replace(/LIMIT/g, '\nLIMIT')
+      .replace(/OFFSET/g, '\nOFFSET')
+      .replace(/AND/g, '\n  AND')
+      .replace(/OR/g, '\n  OR')
     
     logger.info({
-      query: `\n${formattedQuery}`,
+      message: 'Database Query',
+      query: formattedQuery,
       duration: `${e.duration}ms`,
       timestamp: new Date().toISOString()
-    }, 'Database Query')
+    })
   } catch (error) {
     logger.error({
-      query: `\n${e.query}`,
+      message: 'Database Query Error',
+      query: e.query,
       params: e.params,
       error: error,
       timestamp: new Date().toISOString()
-    }, 'Database Query Error')
+    })
   }
 })
 

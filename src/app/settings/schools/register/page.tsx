@@ -210,19 +210,19 @@ export default function CreateSchool() {
               />
             </div>
 
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end gap-2 mt-6">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
-                disabled={isLoading}
+                onClick={() => router.push('/settings/schools')}
               >
                 취소
               </Button>
-              <Button type="submit" disabled={isLoading || registeredSchool}>
-                {isLoading && (
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
-                )}
+              <Button
+                type="submit"
+                variant="default"
+                className="bg-black hover:bg-gray-900 text-white"
+              >
                 등록
               </Button>
             </div>
@@ -247,6 +247,8 @@ export default function CreateSchool() {
                 <Button
                   onClick={handleUploadStudents}
                   disabled={students.length === 0 || isLoading}
+                  variant="default"
+                  className="bg-black hover:bg-gray-900 text-white"
                 >
                   {isLoading ? '업로드 중...' : '학생 등록'}
                 </Button>
