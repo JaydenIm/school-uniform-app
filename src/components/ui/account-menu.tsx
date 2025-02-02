@@ -4,11 +4,13 @@ import { signOut, useSession } from "next-auth/react";
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { UserCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function AccountMenu() {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -20,6 +22,18 @@ export function AccountMenu() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ 
+        redirect: false,
+        callbackUrl: '/login'
+      });
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -37,7 +51,7 @@ export function AccountMenu() {
           <button
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
-              // 프로필 처리
+              router.push('/profile');
               setIsOpen(false);
             }}
           >
@@ -45,7 +59,7 @@ export function AccountMenu() {
           </button>
           <button
             className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={handleLogout}
           >
             로그아웃
           </button>

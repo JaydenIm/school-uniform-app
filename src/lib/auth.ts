@@ -74,9 +74,12 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: '/login',
+    signOut: '/login',
+    error: '/login',  // 에러 발생시 리다이렉트
   },
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30일
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -88,10 +91,10 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token) {
-        session.user.id = token.id;
-        session.user.email = token.email;
-        session.user.name = token.name;
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
       return session;
     }

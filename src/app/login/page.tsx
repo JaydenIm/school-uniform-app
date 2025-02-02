@@ -24,14 +24,18 @@ const LoginPage = () => {
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        redirect: false
+        redirect: false,
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
 
-      router.push('/dashboard');
+      if (result?.ok) {
+        // 세션이 완전히 설정될 때까지 잠시 대기
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        router.replace('/dashboard');
+      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {

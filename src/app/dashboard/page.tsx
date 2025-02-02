@@ -8,6 +8,10 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Overview } from "@/components/overview"
 import { RecentSales } from "@/components/recent-sales"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 const sidebarNavItems = [
   {
@@ -43,10 +47,40 @@ const sidebarNavItems = [
 ]
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace('/login');
+    } else if (status === 'authenticated') {
+      setIsLoading(false);
+      // 첫 방문 체크
+      const hasVisited = localStorage.getItem('hasVisitedDashboard');
+      if (!hasVisited && session?.user?.name) {
+        toast.success(`환영합니다, ${session.user.name}님!`);
+        localStorage.setItem('hasVisitedDashboard', 'true');
+      }
+    }
+  }, [status, session, router]);
+
+  if (isLoading || status === 'loading') {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-lg font-semibold mb-4">환영합니다!</h2>
+        <p>현재 로그인된 사용자: {session?.user?.name}</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -170,5 +204,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
