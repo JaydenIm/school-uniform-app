@@ -1,100 +1,92 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
-import { cookies } from 'next/headers'
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-export async function POST(request: Request) {
+export async function GET() {
   try {
-    const body = await request.json()
-    const { schoolName, yearMonth } = body
+    const session = await getServerSession(authOptions);
     
-    // 쿠키에서 사용자 정보 가져오기
-    const cookieStore = await cookies()
-    const userCookie = cookieStore.get('user')
-    const user = userCookie ? JSON.parse(userCookie.value) : null
-
-    if (!user?.id) {
+    if (!session) {
       return NextResponse.json(
-        { success: false, message: '로그인이 필요합니다.' },
+        { error: "로그인이 필요합니다." },
         { status: 401 }
-      )
-    }
-
-    if (!schoolName || !yearMonth) {
-      return NextResponse.json(
-        { success: false, message: '필수 입력값이 누락되었습니다.' },
-        { status: 400 }
-      )
-    }
-
-    // 해당 yearMonth의 마지막 seq 조회
-    const lastSchool = await prisma.schools.findFirst({
-      where: { yearMonth },
-      orderBy: { seq: 'desc' }
-    })
-
-    // 새로운 seq 생성 (YYYYMM00001 형식)
-    const lastSeq = lastSchool ? parseInt(lastSchool.seq.slice(-5)) : 0
-    const newSeq = `${yearMonth}${String(lastSeq + 1).padStart(5, '0')}`
-
-    const school = await prisma.schools.create({
-      data: {
-        seq: newSeq,
-        yearMonth,
-        schoolName,
-        userId: Number(user.id),
-        useYn: 'Y',
-        createdAt: new Date(),
-      },
-    })
-
-    return NextResponse.json({ 
-      success: true, 
-      message: '학교가 등록되었습니다.',
-      data: school 
-    })
-
-  } catch (error) {
-    console.error('School creation error:', error)
-    return NextResponse.json(
-      { success: false, message: '학교 등록에 실패했습니다.' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function GET(request: Request) {
-  try {
-    const cookieStore = await cookies()
-    const userCookie = cookieStore.get('user')
-    const user = userCookie ? JSON.parse(userCookie.value) : null
-
-    if (!user?.id) {
-      return NextResponse.json(
-        { success: false, message: '로그인이 필요합니다.' },
-        { status: 401 }
-      )
+      );
     }
 
     const schools = await prisma.schools.findMany({
+      select: {
+        id: true,
+        seq: true,
+        yearMonth: true,
+        schoolName: true,
+        userId: true,
+        useYn: true,
+        createdAt: true,
+      },
       where: {
-        userId: user.id,
         useYn: 'Y'
       },
       orderBy: {
         createdAt: 'desc'
       }
-    })
+    });
 
-    return NextResponse.json({ 
-      success: true, 
-      data: schools 
-    })
+    return NextResponse.json(schools);
 
   } catch (error) {
-    console.error('Schools fetch error:', error)
+    console.error("Schools API Error:", error);
     return NextResponse.json(
-      { success: false, message: '학교 목록 조회에 실패했습니다.' },
+      { error: "서버 오류가 발생했습니다." },
       { status: 500 }
-    )
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    console.log('Received body:', body);  // 디버깅용 로그 추가
+    
+    // 필수 필드 검증
+    if (!body.seq || !body.yearMonth || !body.schoolName) {
+      console.log('Missing required fields:', { 
+        seq: body.seq, 
+        yearMonth: body.yearMonth, 
+        schoolName: body.schoolName 
+      });  // 디버깅용 로그 추가
+      return NextResponse.json(
+        { error: "필수 입력값이 누락되었습니다." },
+        { status: 400 }
+      );
+    }
+
+    const school = await prisma.schools.create({
+      data: {
+        seq: body.seq,
+        yearMonth: body.yearMonth,
+        schoolName: body.schoolName,
+        userId: parseInt(session.user.id),
+        useYn: 'Y'
+      }
+    });
+
+    return NextResponse.json(school);
+
+  } catch (error) {
+    console.error("Schools API Error:", error);
+    return NextResponse.json(
+      { error: "학교 등록에 실패했습니다." },
+      { status: 500 }
+    );
   }
 }

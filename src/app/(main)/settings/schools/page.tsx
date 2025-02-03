@@ -7,12 +7,16 @@ import { toast } from "sonner";
 import { TabulatorFull } from 'tabulator-tables';
 import type { TabulatorFull as Tabulator } from 'tabulator-tables';
 import "tabulator-tables/dist/css/tabulator.min.css";
+import { format } from 'date-fns';
+import { useSession } from 'next-auth/react';
 
 interface School {
   id: number;
   seq: string;
-  schoolName: string;
   yearMonth: string;
+  schoolName: string;
+  userId: number;
+  useYn: string;
   createdAt: string;
 }
 
@@ -26,6 +30,7 @@ interface Student {
 type Tabulator = InstanceType<typeof TabulatorFull>;
 
 export default function SchoolsPage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchoolId, setSelectedSchoolId] = useState<number | null>(null);
@@ -34,8 +39,15 @@ export default function SchoolsPage() {
   const tabulator = useRef<Tabulator | null>(null);
 
   useEffect(() => {
-    fetchSchools();
-  }, []);
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    if (status === 'authenticated') {
+      fetchSchools();
+    }
+  }, [status, router]);
 
   useEffect(() => {
     if (schools.length > 0 && !selectedSchoolId) {
@@ -70,16 +82,24 @@ export default function SchoolsPage() {
 
   const fetchSchools = async () => {
     try {
-      const response = await fetch('/api/schools');
-      const data = await response.json();
-
+      const response = await fetch('/api/schools', {
+        credentials: 'include'
+      });
+      
       if (!response.ok) {
-        throw new Error(data.message || '학교 목록 조회에 실패했습니다.');
+        if (response.status === 401) {
+          router.push('/login');
+          return;
+        }
+        throw new Error('데이터를 불러오는데 실패했습니다.');
       }
 
-      setSchools(data.data);
-    } catch (error: any) {
-      toast.error(error.message);
+      const data = await response.json();
+      setSchools(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching schools:', error);
+      toast.error('학교 목록을 불러오는데 실패했습니다.');
+      setSchools([]);
     } finally {
       setIsLoading(false);
     }
@@ -105,6 +125,44 @@ export default function SchoolsPage() {
     }
   };
 
+  const handleAddSchool = async () => {
+    try {
+      // 현재 날짜로 seq와 yearMonth 생성
+      const now = new Date();
+      const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const seq = `${yearMonth}00001`;  // 실제로는 DB에서 마지막 seq를 조회하여 +1 해야 함
+
+      const response = await fetch('/api/schools', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          seq,
+          yearMonth,
+          schoolName: '테스트학교',
+        }),
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || '학교 등록에 실패했습니다.');
+      }
+
+      toast.success('학교가 등록되었습니다.');
+      fetchSchools();
+    } catch (error: any) {
+      console.error('Error adding school:', error);
+      toast.error(error.message || '학교 등록에 실패했습니다.');
+    }
+  };
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -127,39 +185,29 @@ export default function SchoolsPage() {
               <table className="min-w-full">
                 <thead>
                   <tr className="border-b">
+                    <th className="text-left py-3 px-4">순번</th>
+                    <th className="text-left py-3 px-4">연월</th>
                     <th className="text-left py-3 px-4">학교명</th>
-                    <th className="text-left py-3 px-4">등록년월</th>
                     <th className="text-left py-3 px-4">등록일</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={3} className="text-center py-4">로딩 중...</td>
-                    </tr>
-                  ) : schools.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="text-center py-4 text-gray-500">
-                        등록된 학교가 없습니다.
+                  {schools.map((school) => (
+                    <tr 
+                      key={school.id} 
+                      className={`border-b cursor-pointer hover:bg-gray-50 ${
+                        selectedSchoolId === school.id ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() => setSelectedSchoolId(school.id)}
+                    >
+                      <td className="py-3 px-4">{school.seq}</td>
+                      <td className="py-3 px-4">{school.yearMonth}</td>
+                      <td className="py-3 px-4">{school.schoolName}</td>
+                      <td className="py-3 px-4">
+                        {format(new Date(school.createdAt), 'yyyy-MM-dd')}
                       </td>
                     </tr>
-                  ) : (
-                    schools.map((school) => (
-                      <tr 
-                        key={school.id} 
-                        className={`border-b cursor-pointer hover:bg-gray-50 ${
-                          selectedSchoolId === school.id ? 'bg-blue-50' : ''
-                        }`}
-                        onClick={() => setSelectedSchoolId(school.id)}
-                      >
-                        <td className="py-3 px-4">{school.schoolName}</td>
-                        <td className="py-3 px-4">{school.yearMonth}</td>
-                        <td className="py-3 px-4">
-                          {new Date(school.createdAt).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                  ))}
                 </tbody>
               </table>
             </div>

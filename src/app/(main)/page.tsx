@@ -71,7 +71,9 @@ export default function DashboardPage() {
       // 게시판 데이터 로드
       const fetchBoards = async () => {
         try {
-          const response = await fetch('/api/boards');
+          const response = await fetch('/api/boards', {
+            credentials: 'include'
+          });
           if (!response.ok) throw new Error('Failed to fetch boards');
           const data = await response.json();
           setBoards(data.slice(0, 5));

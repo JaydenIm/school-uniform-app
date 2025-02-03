@@ -15,21 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
-      <body className={inter.className}>
+    <html lang="en">
+      <body>
         <SessionProvider>
-          <div className="flex h-screen">
-            <LeftMenu />
-            <main className="flex-1 ml-64">
-              <div className="p-4 border-b flex justify-end">
-                <AccountMenu />
-              </div>
-              <div className="p-6">
-                {children}
-              </div>
-            </main>
-          </div>
-          <Toaster />
+          {/* 여기서 LeftMenu를 제거하고 children만 렌더링 */}
+          {children}
         </SessionProvider>
       </body>
     </html>
