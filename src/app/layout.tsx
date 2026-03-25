@@ -3,8 +3,6 @@
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import { Inter } from "next/font/google";
-import { LeftMenu } from "@/components/ui/left-menu";
-import { AccountMenu } from "@/components/ui/account-menu";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });

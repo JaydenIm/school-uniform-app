@@ -1,12 +1,13 @@
 'use client';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { Upload, Download, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Upload, Download, CheckCircle2 } from "lucide-react"
 import * as XLSX from 'xlsx-js-style'
 import { saveAs } from 'file-saver'
 import { DataTable } from "@/components/ui/data-table"
@@ -23,6 +24,7 @@ interface StudentInfo {
 
 export default function CreateSchool() {
   const router = useRouter()
+  const { data: session, status: sessionStatus } = useSession();
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -33,6 +35,31 @@ export default function CreateSchool() {
   })
   const [schoolId, setSchoolId] = useState<number | null>(null)
   const [students, setStudents] = useState<any[]>([])
+
+  // 초기 로드 시 sessionStorage에서 데이터 복구
+  useEffect(() => {
+    const savedStep = sessionStorage.getItem('register_step');
+    const savedSchoolId = sessionStorage.getItem('register_schoolId');
+    const savedFormData = sessionStorage.getItem('register_formData');
+    
+    if (savedStep) setStep(parseInt(savedStep));
+    if (savedSchoolId) setSchoolId(parseInt(savedSchoolId));
+    if (savedFormData) setFormData(JSON.parse(savedFormData));
+  }, []);
+
+  // 상태 변경 시 sessionStorage 동기화
+  useEffect(() => {
+    sessionStorage.setItem('register_step', step.toString());
+    if (schoolId) sessionStorage.setItem('register_schoolId', schoolId.toString());
+    sessionStorage.setItem('register_formData', JSON.stringify(formData));
+  }, [step, schoolId, formData]);
+
+  // 세션 체크
+  useEffect(() => {
+    if (sessionStatus === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [sessionStatus, router]);
 
   const handleNextStep = async () => {
     if (!formData.schoolName || !formData.yearMonth) {
@@ -49,7 +76,13 @@ export default function CreateSchool() {
       })
 
       const result = await response.json()
-      if (!response.ok) throw new Error(result.error || "학교 등록 실패")
+      if (!response.ok) {
+        if (response.status === 401) {
+           router.push('/login');
+           return;
+        }
+        throw new Error(result.error || "학교 등록 실패")
+      }
 
       setSchoolId(result.data.id)
       setStep(2)
@@ -70,22 +103,38 @@ export default function CreateSchool() {
       try {
         const data = new Uint8Array(e.target?.result as ArrayBuffer)
         const workbook = XLSX.read(data, { type: 'array' })
-        const sheet = workbook.Sheets[workbook.SheetNames[0]]
+        const sheetName = workbook.SheetNames[0]
+        const sheet = workbook.Sheets[sheetName]
         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[]
         
-        const mappedData = jsonData.slice(1).map((row: any) => ({
-          studentName: row[0] || '',
-          grade: row[1] || '',
-          class: row[2] || '',
-          birthDate: row[3] || '',
-          phoneNumber: row[4] || '',
-          name: row[0], // DataTable matches 'name'
-        }))
+        console.log('Sheet Name:', sheetName)
+        console.log('Raw Excel Data:', jsonData)
+
+        // 데이터 시작점이 어디인지 찾기 (첫 번째 열에 이름이 있는 첫 행 찾기)
+        const startIndex = jsonData.findIndex(row => row && row[0] && row[0] !== '학생명' && row[0] !== '이름')
+        const dataRows = startIndex !== -1 ? jsonData.slice(startIndex) : jsonData.slice(1)
+
+        const mappedData = dataRows
+          .filter(row => row && row.length > 0 && (row[0] || row[1])) // 이름이나 학년이라도 있는 경우
+          .map((row: any) => ({
+            studentName: row[0]?.toString() || '',
+            grade: row[1]?.toString() || '',
+            class: row[2]?.toString() || '',
+            birthDate: row[3]?.toString() || '',
+            phoneNumber: row[4]?.toString() || '',
+            name: row[0]?.toString() || '', // DataTable support
+          }))
+
+        if (mappedData.length === 0) {
+          toast.error("유효한 학생 데이터가 없습니다. 양식을 확인해 주세요.")
+          return
+        }
 
         setStudents(mappedData)
         toast.success(`${mappedData.length}명의 학생 데이터를 읽었습니다.`)
       } catch (err) {
-        toast.error("엑셀 파일 파싱 오류")
+        console.error("Excel mapping error:", err)
+        toast.error("엑셀 파일 파싱 중 오류가 발생했습니다.")
       }
     }
     reader.readAsArrayBuffer(file)
@@ -106,7 +155,14 @@ export default function CreateSchool() {
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
 
   const handleFinalSubmit = async () => {
-    if (!schoolId || students.length === 0) return
+    if (!schoolId) {
+      toast.error("학교 정보가 누락되었습니다. 첫 단계부터 다시 진행해 주세요.")
+      return
+    }
+    if (students.length === 0) {
+      toast.error("등록할 학생이 없습니다.")
+      return
+    }
     
     setIsLoading(true)
     try {
@@ -116,13 +172,20 @@ export default function CreateSchool() {
         body: JSON.stringify({ schoolId, students }),
       })
 
-      if (!response.ok) throw new Error("학생 등록 실패")
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.message || "학생 등록 실패")
       
+      // 등록 성공 시 세션 데이터 정리
+      sessionStorage.removeItem('register_step')
+      sessionStorage.removeItem('register_schoolId')
+      sessionStorage.removeItem('register_formData')
+
       setShowSuccessOverlay(true)
       setTimeout(() => {
         router.push(`/settings/schools?newId=${schoolId}`)
       }, 1500)
     } catch (err: any) {
+      console.error("Final submit error:", err)
       toast.error(err.message)
       setIsLoading(false)
     }
@@ -196,7 +259,7 @@ export default function CreateSchool() {
                 <Input
                   id="yearMonth"
                   type="month"
-                  value={formData.yearMonth.slice(0, 4) + '-' + formData.yearMonth.slice(4)}
+                  value={formData.yearMonth.length === 6 ? formData.yearMonth.slice(0, 4) + '-' + formData.yearMonth.slice(4) : ''}
                   onChange={e => setFormData(p => ({ ...p, yearMonth: e.target.value.replace(/-/g, '') }))}
                   className="h-11"
                 />
@@ -224,7 +287,7 @@ export default function CreateSchool() {
             </div>
             
             <div className="flex justify-between pt-6 border-t">
-              <Button variant="ghost" onClick={() => router.back()}>취소</Button>
+              <Button variant="ghost" onClick={() => router.push('/settings/schools')}>취소</Button>
               <Button onClick={handleNextStep} disabled={isLoading} className="bg-black hover:bg-gray-800 text-white min-w-[120px]">
                 {isLoading ? "처리 중..." : (
                   <span className="flex items-center">다음 단계 <ArrowRight className="ml-2 w-4 h-4" /></span>
@@ -266,8 +329,29 @@ export default function CreateSchool() {
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-gray-700">업로드 데이터 미리보기 ({students.length}명)</h3>
                 </div>
-                <div className="max-h-[400px] overflow-auto border rounded-lg shadow-inner">
-                   <DataTable columns={columns} data={students} placeholder="데이터가 없습니다." />
+                <div className="max-h-[400px] overflow-auto border rounded-xl shadow-inner scrollbar-hide">
+                   <table className="w-full text-sm text-left border-collapse">
+                      <thead className="bg-gray-50 sticky top-0">
+                         <tr>
+                            <th className="p-3 border-b font-bold">이름</th>
+                            <th className="p-3 border-b font-bold">학년</th>
+                            <th className="p-3 border-b font-bold">반</th>
+                            <th className="p-3 border-b font-bold">생년월일</th>
+                            <th className="p-3 border-b font-bold">연락처</th>
+                         </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                         {students.map((s, i) => (
+                            <tr key={i} className="hover:bg-gray-50 transition-colors">
+                               <td className="p-3">{s.studentName}</td>
+                               <td className="p-3">{s.grade}</td>
+                               <td className="p-3">{s.class}</td>
+                               <td className="p-3">{s.birthDate}</td>
+                               <td className="p-3">{s.phoneNumber}</td>
+                            </tr>
+                         ))}
+                      </tbody>
+                   </table>
                 </div>
               </div>
             )}

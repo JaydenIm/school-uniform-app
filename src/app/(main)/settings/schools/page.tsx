@@ -43,16 +43,18 @@ export default function SchoolsPage() {
   }, [status, router]);
 
   useEffect(() => {
-    // 쿼리 파라미터에 newId가 있으면 해당 학교를 선택
     const newId = searchParams.get('newId');
     if (newId && schools.length > 0) {
-      setSelectedSchoolId(Number(newId));
-      // URL 클리닝
-      window.history.replaceState({}, '', '/settings/schools');
-    } else if (schools.length > 0 && !selectedSchoolId) {
+      const idNum = Number(newId);
+      if (selectedSchoolId !== idNum) {
+        setSelectedSchoolId(idNum);
+      }
+      // URL에서 newId 제거 (Next.js router 사용 권장)
+      router.replace('/settings/schools', { scroll: false });
+    } else if (schools.length > 0 && selectedSchoolId === null) {
       setSelectedSchoolId(schools[0].id);
     }
-  }, [schools, selectedSchoolId, searchParams]);
+  }, [schools, selectedSchoolId, searchParams, router]);
 
   useEffect(() => {
     if (selectedSchoolId) {
