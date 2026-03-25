@@ -103,6 +103,8 @@ export default function CreateSchool() {
     saveAs(new Blob([buf]), '학생명단_업로드양식.xlsx')
   }
 
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
+
   const handleFinalSubmit = async () => {
     if (!schoolId || students.length === 0) return
     
@@ -116,17 +118,46 @@ export default function CreateSchool() {
 
       if (!response.ok) throw new Error("학생 등록 실패")
       
-      toast.success("전체 등록이 완료되었습니다.")
-      router.push('/settings/schools')
+      setShowSuccessOverlay(true)
+      setTimeout(() => {
+        router.push(`/settings/schools?newId=${schoolId}`)
+      }, 1500)
     } catch (err: any) {
       toast.error(err.message)
-    } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="container mx-auto py-10 px-4 max-w-5xl">
+    <div className="container mx-auto py-8 px-4 max-w-5xl relative">
+      {showSuccessOverlay && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-md z-50 flex flex-col items-center justify-center animate-in fade-in duration-500">
+           <div className="bg-white p-12 rounded-3xl shadow-2xl flex flex-col items-center space-y-6 border border-gray-100 animate-in zoom-in-95 duration-500">
+              <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white scale-110 shadow-lg shadow-green-200">
+                 <CheckCircle2 className="w-12 h-12" />
+              </div>
+              <div className="text-center space-y-2">
+                <h2 className="text-3xl font-bold">등록 완료!</h2>
+                <p className="text-gray-500">모든 정보가 성공적으로 저장되었습니다.<br/>잠시 후 목록 페이지로 이동합니다.</p>
+              </div>
+           </div>
+        </div>
+      )}
+      {/* Breadcrumbs */}
+      <nav className="flex mb-8 text-sm text-gray-500" aria-label="Breadcrumb">
+        <ol className="flex items-center space-x-2">
+          <li>계정 설정</li>
+          <li className="flex items-center space-x-2">
+            <ArrowRight className="w-3 h-3 mx-1" />
+            <button onClick={() => router.push('/settings/schools')} className="hover:text-black">학교 관리</button>
+          </li>
+          <li className="flex items-center space-x-2">
+            <ArrowRight className="w-3 h-3 mx-1" />
+            <span className="text-black font-semibold">학교 등록</span>
+          </li>
+        </ol>
+      </nav>
+
       {/* Stepper Header */}
       <div className="flex items-center justify-center mb-10">
         <div className={`flex items-center ${step >= 1 ? 'text-black' : 'text-gray-400'}`}>
