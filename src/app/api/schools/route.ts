@@ -55,32 +55,45 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    console.log('Received body:', body);  // 디버깅용 로그 추가
+    console.log('Received body:', body);
     
     // 필수 필드 검증
-    if (!body.seq || !body.yearMonth || !body.schoolName) {
-      console.log('Missing required fields:', { 
-        seq: body.seq, 
-        yearMonth: body.yearMonth, 
-        schoolName: body.schoolName 
-      });  // 디버깅용 로그 추가
+    if (!body.yearMonth || !body.schoolName) {
       return NextResponse.json(
         { error: "필수 입력값이 누락되었습니다." },
         { status: 400 }
       );
     }
 
+    // seq 자동 생성 로직
+    const lastSchool = await prisma.schools.findFirst({
+      where: {
+        yearMonth: body.yearMonth,
+      },
+      orderBy: {
+        seq: 'desc',
+      },
+    });
+
+    let nextSeq = body.yearMonth + '00001';
+    if (lastSchool) {
+      const lastSeqNum = parseInt(lastSchool.seq.slice(-5));
+      nextSeq = body.yearMonth + String(lastSeqNum + 1).padStart(5, '0');
+    }
+
     const school = await prisma.schools.create({
       data: {
-        seq: body.seq,
+        seq: nextSeq,
         yearMonth: body.yearMonth,
         schoolName: body.schoolName,
+        address: body.address || null,
+        managerContact: body.managerContact || null,
         userId: parseInt(session.user.id),
         useYn: 'Y'
       }
     });
 
-    return NextResponse.json(school);
+    return NextResponse.json({ success: true, data: school });
 
   } catch (error) {
     console.error("Schools API Error:", error);

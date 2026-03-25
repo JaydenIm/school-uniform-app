@@ -7,12 +7,22 @@ export type Student = {
   name: string
   birthDate: string
   phoneNumber: string
+  grade?: string
+  class?: string
 }
 
 export const columns: ColumnDef<Student>[] = [
   {
     accessorKey: "name",
     header: "이름",
+  },
+  {
+    accessorKey: "grade",
+    header: "학년",
+  },
+  {
+    accessorKey: "class",
+    header: "반",
   },
   {
     accessorKey: "birthDate",

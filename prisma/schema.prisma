@@ -14,14 +14,16 @@ datasource db {
 }
 
 model Schools {
-  id         Int       @id @default(autoincrement())
-  seq        String
-  schoolName String
-  yearMonth  String
-  userId     Int       @map("user_id")
-  useYn      String    @default("Y")
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @default(now())
+  id             Int       @id @default(autoincrement())
+  seq            String
+  schoolName     String
+  yearMonth      String
+  address        String?   @db.VarChar(200)   // 주소 추가
+  managerContact String?   @db.VarChar(50)    // 담당자 연락처 추가
+  userId         Int       @map("user_id")
+  useYn          String    @default("Y")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
   
   users      Users     @relation(fields: [userId], references: [id])
   students   Students[]
@@ -32,9 +34,11 @@ model Schools {
 model Students {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(50)
-  birthDate   String?  @db.VarChar(10)    // Date 대신 String으로 변경
+  birthDate   String?  @db.VarChar(10)
   phoneNumber String?  @db.VarChar(20)
   gender      String?  @db.VarChar(10)
+  grade       String?  @db.VarChar(10)    // 학년 추가
+  class       String?  @db.VarChar(10)    // 반 추가
   schoolId    Int
   useYn       String   @default("Y") @db.Char(1)
   createdAt   DateTime @default(now())

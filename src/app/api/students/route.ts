@@ -30,9 +30,11 @@ export async function POST(request: Request) {
       const createdStudents = await prisma.students.createMany({
         data: students.map((student: any) => ({
           name: student.studentName,
-          birthDate: student.birthDate.toString(),  // Date를 string으로 변환
+          birthDate: student.birthDate ? student.birthDate.toString() : null,
           phoneNumber: student.phoneNumber || null,
           gender: student.gender || null,
+          grade: student.grade || null,
+          class: student.class || null,
           schoolId: parseInt(schoolId),
           useYn: 'Y'
         }))
