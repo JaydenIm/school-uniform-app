@@ -1,44 +1,81 @@
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+
 const prisma = new PrismaClient();
 
 async function main() {
-  const testUser = await prisma.users.create({
-    data: {
-      loginId: 'uniform_admin',
-      password: '1234',
-      name: '교복관리자',
-      email: 'test@test.com',
-    },
-  })
-  console.log('Created test user:', testUser)
-  
-  const sampleBoards = [
-    { title: '공지사항: 시스템 업데이트 안내', content: '시스템 업데이트 내용...' },
-    { title: '새로운 기능 추가 안내', content: '새로운 기능 소개...' },
-    { title: '2024년 1분기 계획', content: '1분기 계획 내용...' },
-    { title: '사용자 매뉴얼 업데이트', content: '매뉴얼 업데이트 내용...' },
-    { title: '긴급 공지: 서버 점검 안내', content: '서버 점검 내용...' },
-    { title: '신규 사용자 가이드', content: '가이드 내용...' },
-    { title: '업데이트 로그 v1.2.0', content: '업데이트 내용...' },
-    { title: '자주 묻는 질문 모음', content: 'FAQ 내용...' },
-    { title: '시스템 사용 팁 공유', content: '사용 팁 내용...' },
-    { title: '연말 정비 계획 안내', content: '정비 계획 내용...' },
-  ];
+  const data = JSON.parse(fs.readFileSync('./prisma/seed-data.json', 'utf8'));
 
-  for (const board of sampleBoards) {
-    await prisma.board.create({
-      data: {
-        ...board,
-      },
+  console.log('Seeding data...');
+
+  // 1. Users
+  for (const user of data.users) {
+    await prisma.users.upsert({
+      where: { id: user.id },
+      update: user,
+      create: user,
     });
   }
+  console.log('Users seeded.');
+
+  // 2. Schools
+  for (const school of data.schools) {
+    await prisma.schools.upsert({
+      where: { id: school.id },
+      update: school,
+      create: school,
+    });
+  }
+  console.log('Schools seeded.');
+
+  // 3. Students
+  for (const student of data.students) {
+    await prisma.students.upsert({
+      where: { id: student.id },
+      update: student,
+      create: student,
+    });
+  }
+  console.log('Students seeded.');
+
+  // 4. Sales
+  for (const sale of data.sales) {
+    await prisma.sales.upsert({
+      where: { id: sale.id },
+      update: sale,
+      create: sale,
+    });
+  }
+  console.log('Sales seeded.');
+
+  // 5. Revenues
+  for (const revenue of data.revenues) {
+    await prisma.revenue.upsert({
+      where: { id: revenue.id },
+      update: revenue,
+      create: revenue,
+    });
+  }
+  console.log('Revenues seeded.');
+
+  // 6. Boards
+  for (const board of data.boards) {
+    await prisma.board.upsert({
+      where: { id: board.id },
+      update: board,
+      create: board,
+    });
+  }
+  console.log('Boards seeded.');
+
+  console.log('Seeding completed successfully.');
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  }) 
+    await prisma.$disconnect();
+  });

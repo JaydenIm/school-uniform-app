@@ -1,0 +1,886 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "loginId": "admin001",
+      "password": "1234",
+      "name": "관리자1_upd",
+      "phoneNumber": "admin1@example.com",
+      "email": "admin1@example.com",
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:50:22.767Z",
+      "updatedAt": "2025-02-02T14:50:22.767Z"
+    },
+    {
+      "id": 2,
+      "loginId": "user001",
+      "password": "1234",
+      "name": "홍길동",
+      "phoneNumber": "010-2345-6789",
+      "email": "hong@example.com",
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:13.331Z",
+      "updatedAt": "2025-02-02T13:58:13.331Z"
+    },
+    {
+      "id": 3,
+      "loginId": "user002",
+      "password": "1234",
+      "name": "김철수",
+      "phoneNumber": "010-3456-7890",
+      "email": "kim@example.com",
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:13.331Z",
+      "updatedAt": "2025-02-02T13:58:13.331Z"
+    },
+    {
+      "id": 4,
+      "loginId": "user003",
+      "password": "1234",
+      "name": "이영희",
+      "phoneNumber": "010-4567-8901",
+      "email": "lee@example.com",
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:13.331Z",
+      "updatedAt": "2025-02-02T13:58:13.331Z"
+    },
+    {
+      "id": 5,
+      "loginId": "user004",
+      "password": "1234",
+      "name": "박민수",
+      "phoneNumber": "010-5678-9012",
+      "email": "park@example.com",
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:13.331Z",
+      "updatedAt": "2025-02-02T13:58:13.331Z"
+    },
+    {
+      "id": 6,
+      "loginId": "uniform_admin",
+      "password": "1234",
+      "name": "교복관리자",
+      "phoneNumber": null,
+      "email": "test@test.com",
+      "useYn": "Y",
+      "createdAt": "2026-03-25T14:46:59.012Z",
+      "updatedAt": "2026-03-25T14:46:59.012Z"
+    }
+  ],
+  "schools": [
+    {
+      "id": 1,
+      "seq": "20240100001",
+      "schoolName": "인천신정중학교",
+      "yearMonth": "202401",
+      "userId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:18.854Z",
+      "updatedAt": "2025-02-02T13:58:18.854Z"
+    },
+    {
+      "id": 2,
+      "seq": "20240100002",
+      "schoolName": "인천공항중학교",
+      "yearMonth": "202401",
+      "userId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:18.854Z",
+      "updatedAt": "2025-02-02T13:58:18.854Z"
+    },
+    {
+      "id": 3,
+      "seq": "20240100003",
+      "schoolName": "영종중학교",
+      "yearMonth": "202401",
+      "userId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:18.854Z",
+      "updatedAt": "2025-02-02T13:58:18.854Z"
+    },
+    {
+      "id": 4,
+      "seq": "20240200001",
+      "schoolName": "인천예송중학교",
+      "yearMonth": "202402",
+      "userId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:18.854Z",
+      "updatedAt": "2025-02-02T13:58:18.854Z"
+    },
+    {
+      "id": 5,
+      "seq": "20240200002",
+      "schoolName": "일산중학교",
+      "yearMonth": "202402",
+      "userId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T13:58:18.854Z",
+      "updatedAt": "2025-02-02T13:58:18.854Z"
+    },
+    {
+      "id": 11,
+      "seq": "20250200001",
+      "schoolName": "테스트1",
+      "yearMonth": "202502",
+      "userId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T06:01:32.622Z",
+      "updatedAt": "2025-02-02T06:01:32.626Z"
+    }
+  ],
+  "students": [
+    {
+      "id": 101,
+      "name": "김민준",
+      "birthDate": "2010-03-15",
+      "phoneNumber": "010-1111-0001",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 102,
+      "name": "이서연",
+      "birthDate": "2010-04-22",
+      "phoneNumber": "010-1111-0002",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 103,
+      "name": "박지훈",
+      "birthDate": "2010-05-30",
+      "phoneNumber": "010-1111-0003",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 104,
+      "name": "정수아",
+      "birthDate": "2010-02-11",
+      "phoneNumber": "010-1111-0004",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 105,
+      "name": "최예준",
+      "birthDate": "2010-07-19",
+      "phoneNumber": "010-1111-0005",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 106,
+      "name": "강서윤",
+      "birthDate": "2010-01-25",
+      "phoneNumber": "010-1111-0006",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 107,
+      "name": "조민서",
+      "birthDate": "2010-08-14",
+      "phoneNumber": "010-1111-0007",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 108,
+      "name": "윤도현",
+      "birthDate": "2010-09-03",
+      "phoneNumber": "010-1111-0008",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 109,
+      "name": "임서진",
+      "birthDate": "2010-11-27",
+      "phoneNumber": "010-1111-0009",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 110,
+      "name": "한지우",
+      "birthDate": "2010-06-08",
+      "phoneNumber": "010-1111-0010",
+      "gender": null,
+      "schoolId": 1,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 111,
+      "name": "송현우",
+      "birthDate": "2010-04-16",
+      "phoneNumber": "010-2222-0001",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 112,
+      "name": "신예린",
+      "birthDate": "2010-05-23",
+      "phoneNumber": "010-2222-0002",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 113,
+      "name": "오동현",
+      "birthDate": "2010-07-01",
+      "phoneNumber": "010-2222-0003",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 114,
+      "name": "권지아",
+      "birthDate": "2010-03-12",
+      "phoneNumber": "010-2222-0004",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 115,
+      "name": "황준서",
+      "birthDate": "2010-08-20",
+      "phoneNumber": "010-2222-0005",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 116,
+      "name": "유서연",
+      "birthDate": "2010-02-26",
+      "phoneNumber": "010-2222-0006",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 117,
+      "name": "백민재",
+      "birthDate": "2010-09-15",
+      "phoneNumber": "010-2222-0007",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 118,
+      "name": "고은서",
+      "birthDate": "2010-10-04",
+      "phoneNumber": "010-2222-0008",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 119,
+      "name": "남지민",
+      "birthDate": "2010-12-28",
+      "phoneNumber": "010-2222-0009",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 120,
+      "name": "심우진",
+      "birthDate": "2010-07-09",
+      "phoneNumber": "010-2222-0010",
+      "gender": null,
+      "schoolId": 2,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 121,
+      "name": "구현우",
+      "birthDate": "2010-05-17",
+      "phoneNumber": "010-3333-0001",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 122,
+      "name": "안소율",
+      "birthDate": "2010-06-24",
+      "phoneNumber": "010-3333-0002",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 123,
+      "name": "전시우",
+      "birthDate": "2010-08-02",
+      "phoneNumber": "010-3333-0003",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 124,
+      "name": "홍지유",
+      "birthDate": "2010-04-13",
+      "phoneNumber": "010-3333-0004",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 125,
+      "name": "문준혁",
+      "birthDate": "2010-09-21",
+      "phoneNumber": "010-3333-0005",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 126,
+      "name": "양하은",
+      "birthDate": "2010-03-27",
+      "phoneNumber": "010-3333-0006",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 127,
+      "name": "손민준",
+      "birthDate": "2010-10-16",
+      "phoneNumber": "010-3333-0007",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 128,
+      "name": "배서아",
+      "birthDate": "2010-11-05",
+      "phoneNumber": "010-3333-0008",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 129,
+      "name": "조예진",
+      "birthDate": "2010-01-29",
+      "phoneNumber": "010-3333-0009",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 130,
+      "name": "채승우",
+      "birthDate": "2010-08-10",
+      "phoneNumber": "010-3333-0010",
+      "gender": null,
+      "schoolId": 3,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 131,
+      "name": "강민재",
+      "birthDate": "2010-06-18",
+      "phoneNumber": "010-4444-0001",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 132,
+      "name": "이하린",
+      "birthDate": "2010-07-25",
+      "phoneNumber": "010-4444-0002",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 133,
+      "name": "박도윤",
+      "birthDate": "2010-09-03",
+      "phoneNumber": "010-4444-0003",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 134,
+      "name": "정지은",
+      "birthDate": "2010-05-14",
+      "phoneNumber": "010-4444-0004",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 135,
+      "name": "김현준",
+      "birthDate": "2010-10-22",
+      "phoneNumber": "010-4444-0005",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 136,
+      "name": "신서연",
+      "birthDate": "2010-04-28",
+      "phoneNumber": "010-4444-0006",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 137,
+      "name": "임준호",
+      "birthDate": "2010-11-17",
+      "phoneNumber": "010-4444-0007",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 138,
+      "name": "황수아",
+      "birthDate": "2010-12-06",
+      "phoneNumber": "010-4444-0008",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 139,
+      "name": "유진우",
+      "birthDate": "2010-02-01",
+      "phoneNumber": "010-4444-0009",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 140,
+      "name": "고은우",
+      "birthDate": "2010-09-11",
+      "phoneNumber": "010-4444-0010",
+      "gender": null,
+      "schoolId": 4,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 141,
+      "name": "송지훈",
+      "birthDate": "2010-07-19",
+      "phoneNumber": "010-5555-0001",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 142,
+      "name": "최서윤",
+      "birthDate": "2010-08-26",
+      "phoneNumber": "010-5555-0002",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 143,
+      "name": "윤현우",
+      "birthDate": "2010-10-04",
+      "phoneNumber": "010-5555-0003",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 144,
+      "name": "백지유",
+      "birthDate": "2010-06-15",
+      "phoneNumber": "010-5555-0004",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 145,
+      "name": "한준서",
+      "birthDate": "2010-11-23",
+      "phoneNumber": "010-5555-0005",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 146,
+      "name": "구하은",
+      "birthDate": "2010-05-29",
+      "phoneNumber": "010-5555-0006",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 147,
+      "name": "오민준",
+      "birthDate": "2010-12-18",
+      "phoneNumber": "010-5555-0007",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 148,
+      "name": "권서아",
+      "birthDate": "2010-01-07",
+      "phoneNumber": "010-5555-0008",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 149,
+      "name": "남도현",
+      "birthDate": "2010-03-02",
+      "phoneNumber": "010-5555-0009",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 150,
+      "name": "심예진",
+      "birthDate": "2010-10-12",
+      "phoneNumber": "010-5555-0010",
+      "gender": null,
+      "schoolId": 5,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T14:02:55.862Z",
+      "updatedAt": "2025-02-02T14:02:55.862Z"
+    },
+    {
+      "id": 151,
+      "name": "업로드2",
+      "birthDate": "20100101",
+      "phoneNumber": "010-1234-5678",
+      "gender": null,
+      "schoolId": 11,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T06:01:40.803Z",
+      "updatedAt": "2025-02-02T06:01:40.803Z"
+    },
+    {
+      "id": 152,
+      "name": "업로드2",
+      "birthDate": "20100101",
+      "phoneNumber": "010-1234-5678",
+      "gender": null,
+      "schoolId": 11,
+      "useYn": "Y",
+      "createdAt": "2025-02-02T06:01:40.803Z",
+      "updatedAt": "2025-02-02T06:01:40.803Z"
+    }
+  ],
+  "sales": [
+    {
+      "id": 1,
+      "amount": 1999,
+      "customer": "Olivia Martin",
+      "email": "olivia.martin@email.com",
+      "createdAt": "2025-02-02T13:57:31.329Z"
+    },
+    {
+      "id": 2,
+      "amount": 39,
+      "customer": "Jackson Lee",
+      "email": "jackson.lee@email.com",
+      "createdAt": "2025-02-02T13:57:31.329Z"
+    },
+    {
+      "id": 3,
+      "amount": 299,
+      "customer": "Isabella Nguyen",
+      "email": "isabella.nguyen@email.com",
+      "createdAt": "2025-02-02T13:57:31.329Z"
+    },
+    {
+      "id": 4,
+      "amount": 99,
+      "customer": "William Kim",
+      "email": "will@email.com",
+      "createdAt": "2025-02-02T13:57:31.329Z"
+    },
+    {
+      "id": 5,
+      "amount": 39,
+      "customer": "Sofia Davis",
+      "email": "sofia.davis@email.com",
+      "createdAt": "2025-02-02T13:57:31.329Z"
+    }
+  ],
+  "revenues": [],
+  "boards": [
+    {
+      "id": 1,
+      "title": "공지사항: 시스템 업데이트 안내",
+      "content": "시스템 업데이트 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 2,
+      "title": "새로운 기능 추가 안내",
+      "content": "새로운 기능 소개...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 3,
+      "title": "2024년 1분기 계획",
+      "content": "1분기 계획 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 4,
+      "title": "사용자 매뉴얼 업데이트",
+      "content": "매뉴얼 업데이트 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 5,
+      "title": "긴급 공지: 서버 점검 안내",
+      "content": "서버 점검 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 6,
+      "title": "신규 사용자 가이드",
+      "content": "가이드 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 7,
+      "title": "업데이트 로그 v1.2.0",
+      "content": "업데이트 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 8,
+      "title": "자주 묻는 질문 모음",
+      "content": "FAQ 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 9,
+      "title": "시스템 사용 팁 공유",
+      "content": "사용 팁 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 10,
+      "title": "연말 정비 계획 안내",
+      "content": "정비 계획 내용...",
+      "createdAt": "2025-02-03T00:17:40.000Z",
+      "updatedAt": "2025-02-03T00:17:40.000Z"
+    },
+    {
+      "id": 11,
+      "title": "공지사항: 시스템 업데이트 안내",
+      "content": "시스템 업데이트 내용...",
+      "createdAt": "2026-03-25T14:46:59.051Z",
+      "updatedAt": "2026-03-25T14:46:59.051Z"
+    },
+    {
+      "id": 12,
+      "title": "새로운 기능 추가 안내",
+      "content": "새로운 기능 소개...",
+      "createdAt": "2026-03-25T14:46:59.057Z",
+      "updatedAt": "2026-03-25T14:46:59.057Z"
+    },
+    {
+      "id": 13,
+      "title": "2024년 1분기 계획",
+      "content": "1분기 계획 내용...",
+      "createdAt": "2026-03-25T14:46:59.062Z",
+      "updatedAt": "2026-03-25T14:46:59.062Z"
+    },
+    {
+      "id": 14,
+      "title": "사용자 매뉴얼 업데이트",
+      "content": "매뉴얼 업데이트 내용...",
+      "createdAt": "2026-03-25T14:46:59.067Z",
+      "updatedAt": "2026-03-25T14:46:59.067Z"
+    },
+    {
+      "id": 15,
+      "title": "긴급 공지: 서버 점검 안내",
+      "content": "서버 점검 내용...",
+      "createdAt": "2026-03-25T14:46:59.071Z",
+      "updatedAt": "2026-03-25T14:46:59.071Z"
+    },
+    {
+      "id": 16,
+      "title": "신규 사용자 가이드",
+      "content": "가이드 내용...",
+      "createdAt": "2026-03-25T14:46:59.075Z",
+      "updatedAt": "2026-03-25T14:46:59.075Z"
+    },
+    {
+      "id": 17,
+      "title": "업데이트 로그 v1.2.0",
+      "content": "업데이트 내용...",
+      "createdAt": "2026-03-25T14:46:59.082Z",
+      "updatedAt": "2026-03-25T14:46:59.082Z"
+    },
+    {
+      "id": 18,
+      "title": "자주 묻는 질문 모음",
+      "content": "FAQ 내용...",
+      "createdAt": "2026-03-25T14:46:59.087Z",
+      "updatedAt": "2026-03-25T14:46:59.087Z"
+    },
+    {
+      "id": 19,
+      "title": "시스템 사용 팁 공유",
+      "content": "사용 팁 내용...",
+      "createdAt": "2026-03-25T14:46:59.093Z",
+      "updatedAt": "2026-03-25T14:46:59.093Z"
+    },
+    {
+      "id": 20,
+      "title": "연말 정비 계획 안내",
+      "content": "정비 계획 내용...",
+      "createdAt": "2026-03-25T14:46:59.098Z",
+      "updatedAt": "2026-03-25T14:46:59.098Z"
+    }
+  ]
+}
