@@ -37,18 +37,49 @@ model Students {
   birthDate   String?  @db.VarChar(10)
   phoneNumber String?  @db.VarChar(20)
   gender      String?  @db.VarChar(10)
-  grade       String?  @db.VarChar(10)    // 학년 추가
-  class       String?  @db.VarChar(10)    // 반 추가
+  grade       String?  @db.VarChar(10)
+  class       String?  @db.VarChar(10)
+  token       String   @unique @default(uuid()) @db.VarChar(36) // QR 인증 토큰
   schoolId    Int
   useYn       String   @default("Y") @db.Char(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
   school      Schools  @relation(fields: [schoolId], references: [id])
-
+  measurement Measurement?
 
   @@index([name])
   @@map("students")
 }
+
+model Measurement {
+  id           Int       @id @default(autoincrement())
+  studentId    Int       @unique
+  // 상의 치수 (cm)
+  shoulder     Float?    // 어깨 너비
+  chest        Float?    // 가슴 둘레
+  upperLength  Float?    // 상의 기장
+  sleeveLength Float?    // 소매 길이
+  // 하의 치수 (cm)
+  waist        Float?    // 허리 둘레
+  hip          Float?    // 엉덩이 둘레
+  thigh        Float?    // 허벅지 둘레
+  pantsLength  Float?    // 바지 길이
+  // 추가 품목 수량
+  qtyHoodie    Int       @default(0) // 후드티
+  qtyTshirt    Int       @default(0) // 반팔티
+  qtyPolo      Int       @default(0) // 폴로티
+  qtySweater   Int       @default(0) // 스웨터
+  // 메모 및 상태
+  note         String?   @db.Text
+  status       String    @default("pending") // pending | measured | completed
+  measuredAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+
+  student      Students  @relation(fields: [studentId], references: [id])
+  @@map("measurements")
+}
+
 
 model Users {
   id          Int      @id @default(autoincrement())
