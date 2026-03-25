@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { TabulatorFull } from 'tabulator-tables';
-import type { TabulatorFull as Tabulator } from 'tabulator-tables';
-import "tabulator-tables/dist/css/tabulator.min.css";
 import { format } from 'date-fns';
 import { useSession } from 'next-auth/react';
+import { DataTable } from "@/components/ui/data-table";
+import { columns, Student } from "./columns";
 
 interface School {
   id: number;
@@ -20,23 +19,14 @@ interface School {
   createdAt: string;
 }
 
-interface Student {
-  id: number;
-  name: string;
-  birthDate: string;
-  phoneNumber: string;
-}
-
-type Tabulator = InstanceType<typeof TabulatorFull>;
-
 export default function SchoolsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [schools, setSchools] = useState<School[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [selectedSchoolId, setSelectedSchoolId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const tableRef = useRef<HTMLDivElement>(null);
-  const tabulator = useRef<Tabulator | null>(null);
+  const [isStudentsLoading, setIsStudentsLoading] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -56,29 +46,10 @@ export default function SchoolsPage() {
   }, [schools, selectedSchoolId]);
 
   useEffect(() => {
-    if (selectedSchoolId && tableRef.current) {
-      initTabulator();
+    if (selectedSchoolId) {
       fetchStudents(selectedSchoolId);
     }
   }, [selectedSchoolId]);
-
-  const initTabulator = () => {
-    if (tableRef.current) {
-      tabulator.current = new TabulatorFull(tableRef.current, {
-        height: '600px',
-        layout: 'fitColumns',
-        columns: [
-          { title: '이름', field: 'name', width: 120, headerHozAlign: 'center', hozAlign: 'center' },
-          { title: '생년월일', field: 'birthDate', width: 120, headerHozAlign: 'center', hozAlign: 'center' },
-          { title: '연락처', field: 'phoneNumber', width: 150, headerHozAlign: 'center', hozAlign: 'center' },
-        ],
-        placeholder: '등록된 학생이 없습니다.',
-        pagination: false,
-        movableColumns: false,
-        cssClass: 'custom-tabulator',
-      });
-    }
-  };
 
   const fetchSchools = async () => {
     try {
@@ -106,6 +77,7 @@ export default function SchoolsPage() {
   };
 
   const fetchStudents = async (schoolId: number) => {
+    setIsStudentsLoading(true);
     try {
       const response = await fetch(`/api/students?schoolId=${schoolId}`);
       const data = await response.json();
@@ -114,14 +86,12 @@ export default function SchoolsPage() {
         throw new Error(data.message || '학생 목록 조회에 실패했습니다.');
       }
 
-      if (tabulator.current) {
-        tabulator.current.setData(data.data);
-      }
+      setStudents(data.data || []);
     } catch (error: any) {
       toast.error(error.message);
-      if (tabulator.current) {
-        tabulator.current.setData([]);
-      }
+      setStudents([]);
+    } finally {
+      setIsStudentsLoading(false);
     }
   };
 
@@ -214,7 +184,7 @@ export default function SchoolsPage() {
           </div>
         </div>
 
-        {/* 오른쪽: 학생 목록 (Tabulator) */}
+        {/* 오른쪽: 학생 목록 (DataTable) */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-4">
             {selectedSchoolId 
@@ -222,9 +192,23 @@ export default function SchoolsPage() {
               : '학교를 선택하세요'
             }
           </h2>
-          <div ref={tableRef} className="w-full"></div>
+          {selectedSchoolId ? (
+            isStudentsLoading ? (
+              <div className="h-[600px] flex items-center justify-center">학생 정보를 불러오는 중...</div>
+            ) : (
+              <DataTable 
+                columns={columns} 
+                data={students} 
+                placeholder="등록된 학생이 없습니다."
+              />
+            )
+          ) : (
+            <div className="h-[600px] flex items-center justify-center text-gray-400">
+              학교를 선택하면 학생 명단이 표시됩니다.
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
-} 
+}
