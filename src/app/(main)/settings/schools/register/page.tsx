@@ -35,6 +35,7 @@ export default function CreateSchool() {
   })
   const [schoolId, setSchoolId] = useState<number | null>(null)
   const [students, setStudents] = useState<any[]>([])
+  const [isDragging, setIsDragging] = useState(false)
 
   // 초기 로드 시 sessionStorage에서 데이터 복구
   useEffect(() => {
@@ -94,10 +95,8 @@ export default function CreateSchool() {
     }
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const processFile = (file: File) => {
     if (!file) return
-
     const reader = new FileReader()
     reader.onload = (e) => {
       try {
@@ -138,6 +137,34 @@ export default function CreateSchool() {
       }
     }
     reader.readAsArrayBuffer(file)
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) processFile(file)
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+      processFile(file)
+    } else if (file) {
+      toast.error('엑셀 파일(.xlsx, .xls)만 업로드 가능합니다.')
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragging(false)
   }
 
   const downloadTemplate = () => {
@@ -321,13 +348,30 @@ export default function CreateSchool() {
             <div className="flex flex-col md:flex-row gap-4 items-end">
                <div className="flex-1 w-full">
                   <Label className="text-xs font-bold mb-2 block text-gray-500">엑셀 파일 (.xlsx, .xls)</Label>
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-3 text-gray-400" />
-                      <p className="mb-2 text-sm text-gray-500">파일을 클릭하거나 여기로 드래그하세요</p>
-                    </div>
-                    <input type="file" className="hidden" accept=".xlsx,.xls" onChange={handleFileUpload} />
-                  </label>
+                  <div
+                    className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200"
+                    style={{
+                      borderColor: isDragging ? '#4B0082' : '#d1d5db',
+                      background: isDragging ? '#EBE0FF' : '#f9fafb',
+                    }}
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById('file-upload-input')?.click()}
+                  >
+                    <Upload className="w-8 h-8 mb-2" style={{ color: isDragging ? '#4B0082' : '#9ca3af' }} />
+                    <p className="text-sm" style={{ color: isDragging ? '#4B0082' : '#6b7280' }}>
+                      {isDragging ? '여기에 파일을 놓으세요!' : '클릭하거나 파일을 드래그하세요'}
+                    </p>
+                    <input
+                      id="file-upload-input"
+                      type="file"
+                      className="hidden"
+                      accept=".xlsx,.xls"
+                      onChange={handleFileUpload}
+                    />
+                  </div>
                </div>
                <Button variant="outline" onClick={downloadTemplate} className="h-11">
                   <Download className="mr-2 w-4 h-4" /> 양식 다운로드
