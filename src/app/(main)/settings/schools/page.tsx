@@ -165,7 +165,8 @@ export default function SchoolsPage() {
         <Button 
           onClick={() => router.push('/settings/schools/register')}
           variant="default"
-          className="bg-black hover:bg-gray-800 text-white shadow-lg h-11 px-6"
+          className="text-white shadow-lg h-11 px-6 hover:opacity-90"
+          style={{ background: 'linear-gradient(135deg, #4B0082, #6A0DAD)' }}
         >
           <PlusCircle className="mr-2 w-4 h-4" /> 학교 신규 등록
         </Button>
@@ -196,8 +197,11 @@ export default function SchoolsPage() {
                         <tr 
                           key={school.id} 
                           className={`cursor-pointer transition-colors duration-200 ${
-                            selectedSchoolId === school.id ? 'bg-black text-white' : 'hover:bg-gray-50'
+                            selectedSchoolId === school.id 
+                              ? 'text-white' 
+                              : 'hover:bg-purple-50'
                           }`}
+                          style={selectedSchoolId === school.id ? { background: '#4B0082' } : {}}
                           onClick={() => setSelectedSchoolId(school.id)}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm">{school.seq}</td>
@@ -230,7 +234,7 @@ export default function SchoolsPage() {
               {selectedSchoolId ? (
                 isStudentsLoading ? (
                   <div className="h-[500px] flex flex-col items-center justify-center space-y-4 text-gray-400">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#4B0082' }}></div>
                     <p>학생 정보를 불러오는 중...</p>
                   </div>
                 ) : (
@@ -264,7 +268,8 @@ export default function SchoolsPage() {
             </div>
             <Button 
               onClick={() => router.push('/settings/schools/register')}
-              className="bg-black hover:bg-gray-800 text-white h-12 px-8"
+              className="text-white h-12 px-8 hover:opacity-90"
+              style={{ background: 'linear-gradient(135deg, #4B0082, #6A0DAD)' }}
             >
               <PlusCircle className="mr-2 w-5 h-5" /> 첫 학교 등록하기
             </Button>

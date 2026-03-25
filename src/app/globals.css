@@ -2,48 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* OnFit 브랜드 CSS 변수 */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* OnFit Brand Colors */
+  --brand-primary: #4B0082;      /* Deep Royal Purple */
+  --brand-secondary: #EBE0FF;    /* Soft Lavender */
+  --brand-accent: #ffffff;       /* Electric White */
+  --brand-primary-hover: #3a0066;
+  --brand-primary-light: #6A0DAD;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
-/* Tabulator 커스텀 스타일 */
-.custom-tabulator.tabulator {
-  background-color: white !important;
-  border: 1px solid #e2e8f0 !important;
+/* OnFit 브랜드 로고 타이포그래피 */
+.brand-logo .brand-on {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.brand-logo .brand-fit {
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
-.custom-tabulator.tabulator .tabulator-header {
-  background-color: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-.custom-tabulator.tabulator .tabulator-row {
-  border-bottom: 1px solid #e2e8f0 !important;
+/* 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-.custom-tabulator.tabulator .tabulator-row.tabulator-row-even {
-  background-color: white !important;
-}
-
-.custom-tabulator.tabulator .tabulator-row.tabulator-row-odd {
-  background-color: white !important;
-}
-
-.custom-tabulator.tabulator .tabulator-placeholder {
-  background-color: white !important;
-  color: #94a3b8 !important;
+.animate-in {
+  animation: fadeIn 0.3s ease forwards;
 }

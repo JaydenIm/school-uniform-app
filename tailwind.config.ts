@@ -11,6 +11,14 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // OnFit Brand Colors
+        brand: {
+          primary: "#4B0082",
+          "primary-hover": "#3a0066",
+          "primary-light": "#6A0DAD",
+          secondary: "#EBE0FF",
+          accent: "#ffffff",
+        },
       },
     },
   },

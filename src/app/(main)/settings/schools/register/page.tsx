@@ -221,17 +221,22 @@ export default function CreateSchool() {
         </ol>
       </nav>
 
-      {/* Stepper Header */}
       <div className="flex items-center justify-center mb-10">
-        <div className={`flex items-center ${step >= 1 ? 'text-black' : 'text-gray-400'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step >= 1 ? 'border-black bg-black text-white' : 'border-gray-300'}`}>1</div>
+        <div className={`flex items-center ${step >= 1 ? 'text-gray-900' : 'text-gray-400'}`}>
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+            style={{ background: step >= 1 ? '#4B0082' : '#d1d5db' }}
+          >1</div>
           <span className="ml-2 font-medium">학교 정보</span>
         </div>
         <div className="w-20 h-[2px] mx-4 bg-gray-200">
-           <div className={`h-full bg-black transition-all ${step >= 2 ? 'w-full' : 'w-0'}`}></div>
+           <div className={`h-full transition-all ${step >= 2 ? 'w-full' : 'w-0'}`} style={{ background: '#4B0082' }}></div>
         </div>
-        <div className={`flex items-center ${step >= 2 ? 'text-black' : 'text-gray-400'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step >= 2 ? 'border-black bg-black text-white' : 'border-gray-300'}`}>2</div>
+        <div className={`flex items-center ${step >= 2 ? 'text-gray-900' : 'text-gray-400'}`}>
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+            style={{ background: step >= 2 ? '#4B0082' : '#d1d5db' }}
+          >2</div>
           <span className="ml-2 font-medium">학생 명단</span>
         </div>
       </div>
@@ -288,7 +293,12 @@ export default function CreateSchool() {
             
             <div className="flex justify-between pt-6 border-t">
               <Button variant="ghost" onClick={() => router.push('/settings/schools')}>취소</Button>
-              <Button onClick={handleNextStep} disabled={isLoading} className="bg-black hover:bg-gray-800 text-white min-w-[120px]">
+              <Button
+                onClick={handleNextStep}
+                disabled={isLoading}
+                className="text-white min-w-[120px] hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, #4B0082, #6A0DAD)' }}
+              >
                 {isLoading ? "처리 중..." : (
                   <span className="flex items-center">다음 단계 <ArrowRight className="ml-2 w-4 h-4" /></span>
                 )}

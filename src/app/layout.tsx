@@ -1,7 +1,3 @@
-'use client';
-
-import { SessionProvider } from "next-auth/react";
-import { Toaster } from "sonner";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -13,12 +9,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <SessionProvider>
-          {/* 여기서 LeftMenu를 제거하고 children만 렌더링 */}
-          {children}
-        </SessionProvider>
+    <html lang="ko">
+      <body className={inter.className}>
+        {children}
       </body>
     </html>
   );

@@ -2,39 +2,56 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, School, ChevronRight } from "lucide-react";
+
+const navItems = [
+  { href: "/", label: "대시보드", icon: LayoutDashboard },
+  { href: "/settings/schools", label: "학교 관리", icon: School },
+];
 
 export function LeftMenu() {
   const pathname = usePathname();
   const router = useRouter();
 
   return (
-    <div className="w-64 bg-black text-white p-6 fixed h-full">
+    <div className="w-64 fixed h-full flex flex-col" style={{ background: '#4B0082' }}>
+      {/* 로고 영역 */}
       <button
-        onClick={() => router.push('/dashboard')}
-        className="text-xl font-bold mb-8 hover:text-gray-300"
+        onClick={() => router.push('/')}
+        className="flex items-center px-6 py-5 border-b border-white/10 hover:bg-white/5 transition-colors"
       >
-        School Uniform
+        <div className="brand-logo text-2xl text-white tracking-tight">
+          <span className="brand-on font-light">On</span><span className="brand-fit font-extrabold">Fit</span>
+        </div>
+        <div className="ml-2 text-[10px] text-white/50 font-medium mt-1">온핏</div>
       </button>
-      <div className="space-y-4">
-        <nav className="space-y-2">
-          <Link 
-            href="/dashboard" 
-            className={`block py-2 px-4 hover:bg-gray-800 rounded ${
-              pathname === '/dashboard' ? 'bg-gray-800' : ''
-            }`}
-          >
-            대시보드
-          </Link>
-          <Link 
-            href="/settings/schools" 
-            className={`block py-2 px-4 hover:bg-gray-800 rounded ${
-              pathname.startsWith('/settings/schools') ? 'bg-gray-800' : ''
-            }`}
-          >
-            학교 관리
-          </Link>
-        </nav>
+
+      {/* 네비게이션 */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
+                ${isActive
+                  ? 'bg-white/20 text-white shadow-inner'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className="flex-1">{label}</span>
+              {isActive && <ChevronRight className="w-3 h-3 opacity-60" />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* 하단 버전 뱃지 */}
+      <div className="px-6 py-4 border-t border-white/10">
+        <span className="text-[10px] text-white/30 font-mono">v1.0.0-beta</span>
       </div>
     </div>
   );
-} 
+}
