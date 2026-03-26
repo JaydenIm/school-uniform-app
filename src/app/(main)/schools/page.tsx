@@ -8,7 +8,10 @@ import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { DataTable } from "@/components/ui/data-table";
 import { columns, Student } from "./columns";
-import { PlusCircle, School as SchoolIcon, ChevronRight, LayoutGrid, ListFilter } from 'lucide-react';
+import { PlusCircle, School as SchoolIcon, ChevronRight, LayoutGrid, ListFilter, Users, CheckCircle, Info, SendIcon } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface School {
   id: number;
@@ -17,7 +20,10 @@ interface School {
   schoolName: string;
   userId: number;
   useYn: string;
+  status: 'active' | 'closed';
   createdAt: string;
+  studentCount: number;
+  measuredCount: number;
 }
 
 /** yearMonth(YYYYMM) → 'YYYY년 MM월' */
@@ -137,78 +143,169 @@ export default function SchoolsPage() {
         /* 2단 그리드: 학교 목록(1/3) + 학생 목록(2/3) */
         <div className="grid grid-cols-3 gap-6 items-start">
           {/* 왼쪽: 학교 목록 */}
-          <div className="col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-4 bg-gray-50/70 border-b flex items-center justify-between">
+          <div className="col-span-1 space-y-4">
+            <div className="flex items-center justify-between px-1">
               <h2 className="text-sm font-bold flex items-center text-gray-700">
                 <ListFilter className="w-4 h-4 mr-2" /> 학교 목록
               </h2>
               <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">총 {schools.length}개</span>
             </div>
-            <div className="overflow-auto max-h-[600px]">
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-white sticky top-0 shadow-[0_1px_0_0_#f3f4f6]">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">연월</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase">학교명</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {schools.map((school) => (
-                    <tr
-                      key={school.id}
-                      className={`cursor-pointer transition-colors duration-150 ${
-                        selectedSchoolId === school.id ? 'text-white' : 'hover:bg-purple-50'
-                      }`}
-                      style={selectedSchoolId === school.id ? { background: '#4B0082' } : {}}
-                      onClick={() => setSelectedSchoolId(school.id)}
-                    >
-                      <td className="px-4 py-3 whitespace-nowrap text-xs opacity-80">{formatYearMonth(school.yearMonth)}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold">{school.schoolName}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            
+            <div className="space-y-3 overflow-auto max-h-[700px] pr-1">
+              {schools.map((school) => {
+                const progress = school.studentCount > 0 ? (school.measuredCount / school.studentCount) * 100 : 0;
+                const isSelected = selectedSchoolId === school.id;
+                
+                return (
+                  <div
+                    key={school.id}
+                    onClick={() => setSelectedSchoolId(school.id)}
+                    className={`group cursor-pointer p-4 rounded-xl border transition-all duration-200 ${
+                      isSelected 
+                        ? 'bg-white border-purple-500 shadow-md ring-1 ring-purple-500' 
+                        : 'bg-white border-gray-100 hover:border-purple-200 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-gray-400 font-medium">{formatYearMonth(school.yearMonth)}</p>
+                        <h3 className={`font-bold text-sm ${isSelected ? 'text-purple-900' : 'text-gray-800'}`}>
+                          {school.schoolName}
+                        </h3>
+                      </div>
+                      <Badge 
+                        variant={school.status === 'active' ? 'default' : 'secondary'}
+                        className={`text-[10px] px-1.5 py-0 rounded-md font-bold ${
+                          school.status === 'active' 
+                            ? 'bg-purple-100 text-purple-700 hover:bg-purple-100' 
+                            : 'bg-gray-100 text-gray-500'
+                        }`}
+                      >
+                        {school.status === 'active' ? '진행 중' : '마감'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="mt-4 space-y-1.5">
+                      <div className="flex justify-between text-[10px] text-gray-500 font-medium">
+                        <span>치수 측정 진행률</span>
+                        <span>{Math.round(progress)}% ({school.measuredCount}/{school.studentCount})</span>
+                      </div>
+                      <Progress 
+                        value={progress} 
+                        className="h-1.5 bg-gray-100" 
+                        style={{'--progress-foreground': '#4B0082'} as any}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* 오른쪽: 학생 목록 */}
-          <div className="col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6 space-y-4">
-            <div className="flex items-center justify-between border-b pb-4">
-              <h2 className="text-lg font-bold flex items-center">
-                <LayoutGrid className="w-5 h-5 mr-2 text-gray-400" />
-                {selectedSchool ? `${selectedSchool.schoolName} 학생 목록` : '학교를 선택하세요'}
-              </h2>
-              {selectedSchool && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full font-medium border border-purple-100">
-                    {formatYearMonth(selectedSchool.yearMonth)}
-                  </span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-                    {students.length}명 등록됨
-                  </span>
+          {/* 오른쪽: 학생 목록 및 대시보드 */}
+          <div className="col-span-2 space-y-6">
+            {selectedSchool ? (
+              <>
+                {/* 통계 요약 대시보드 */}
+                <div className="grid grid-cols-4 gap-4 animate-in">
+                  {[
+                    { label: '전체 학생', value: selectedSchool.studentCount, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50/50' },
+                    { label: '측정 완료', value: selectedSchool.measuredCount, icon: CheckCircle, color: 'text-purple-600', bg: 'bg-purple-50/50' },
+                    { label: '미측정', value: selectedSchool.studentCount - selectedSchool.measuredCount, icon: Info, color: 'text-amber-600', bg: 'bg-amber-50/50' },
+                    { label: '진행률', value: `${Math.round(selectedSchool.studentCount > 0 ? (selectedSchool.measuredCount / selectedSchool.studentCount) * 100 : 0)}%`, icon: LayoutGrid, color: 'text-emerald-600', bg: 'bg-emerald-50/50' },
+                  ].map((stat, i) => (
+                    <div key={i} className={`${stat.bg} p-5 rounded-2xl border border-white shadow-sm hover:shadow-md transition-all duration-300`}>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">{stat.label}</p>
+                          <p className={`text-2xl font-black mt-1 ${stat.color}`}>{stat.value}</p>
+                        </div>
+                        <div className={`p-2 rounded-lg ${stat.bg.replace('/50', '')} ${stat.color} bg-opacity-10`}>
+                          <stat.icon className="w-5 h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
 
-            {selectedSchoolId ? (
-              isStudentsLoading ? (
-                <div className="h-[460px] flex flex-col items-center justify-center space-y-4 text-gray-400">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#4B0082' }} />
-                  <p className="text-sm">학생 정보를 불러오는 중...</p>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-in" style={{ animationDelay: '0.1s' }}>
+                  <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-xl font-black text-gray-900 flex items-center">
+                        {selectedSchool.schoolName}
+                        <Badge className={`ml-3 border-none font-bold ${
+                          selectedSchool.status === 'active' 
+                            ? 'bg-purple-100 text-purple-700 hover:bg-purple-100' 
+                            : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {selectedSchool.status === 'active' ? '측정 진행 중' : '기간 마감'}
+                        </Badge>
+                      </h2>
+                      <p className="text-sm text-gray-400 mt-1 font-medium">학생들의 치수 측정 현황을 관리하고 QR 코드를 공유하세요.</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" className="h-10 text-xs font-bold border-gray-200 hover:bg-gray-50">
+                        <SendIcon className="w-3.5 h-3.5 mr-2 text-purple-600" /> QR/문자 발송
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={`h-10 text-xs font-bold border-gray-200 transition-colors ${
+                          selectedSchool.status === 'closed' 
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100' 
+                            : 'hover:bg-red-50 hover:text-red-600 hover:border-red-100'
+                        }`}
+                        onClick={async () => {
+                          const newStatus = selectedSchool.status === 'active' ? 'closed' : 'active';
+                          try {
+                            const res = await fetch(`/api/schools/${selectedSchool.id}/status`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ status: newStatus })
+                            });
+                            if (res.ok) fetchSchools();
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >
+                        {selectedSchool.status === 'active' ? '측정 마감하기' : '측정 재개하기'}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <Tabs defaultValue="all" className="w-full mb-6">
+                      <TabsList className="bg-gray-100/50 p-1 rounded-xl">
+                        <TabsTrigger value="all" className="text-xs font-bold px-8 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">전체 학생</TabsTrigger>
+                        <TabsTrigger value="pending" className="text-xs font-bold px-8 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">미측정 인원</TabsTrigger>
+                        <TabsTrigger value="completed" className="text-xs font-bold px-8 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">측정 완료</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+
+                    <div className="rounded-xl border border-gray-100 overflow-hidden">
+                      {isStudentsLoading ? (
+                        <div className="h-[400px] flex flex-col items-center justify-center space-y-4 text-gray-400">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#4B0082' }} />
+                          <p className="text-sm">학생 정보를 불러오는 중...</p>
+                        </div>
+                      ) : (
+                        <DataTable
+                          columns={columns}
+                          data={students}
+                          placeholder="등록된 학생이 없습니다."
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="animate-in fade-in duration-300">
-                  <DataTable
-                    columns={columns}
-                    data={students}
-                    placeholder="등록된 학생이 없습니다."
-                  />
-                </div>
-              )
+              </>
             ) : (
-              <div className="h-[460px] flex flex-col items-center justify-center text-gray-400 space-y-3 bg-gray-50/50 rounded-lg border-2 border-dashed">
-                <SchoolIcon className="w-12 h-12 text-gray-200" />
-                <p className="text-sm">좌측 목록에서 학교를 선택해 주세요.</p>
+              <div className="h-[600px] flex flex-col items-center justify-center bg-white rounded-2xl border border-dashed border-gray-200 text-gray-400">
+                <SchoolIcon className="w-16 h-16 mb-4 opacity-10" />
+                <p className="font-bold">학교를 선택하면 학생 명단이 표시됩니다.</p>
+                <p className="text-xs mt-1">왼쪽 목록에서 학교를 클릭해 주세요.</p>
               </div>
             )}
           </div>

@@ -24,22 +24,31 @@ async function main() {
           yearMonth: '202603',
           schoolName: '온핏중학교',
           userId: user.id,
-          useYn: 'Y'
+          useYn: 'Y',
+          status: 'active'
         }
       })
     }
 
-    const student = await prisma.students.create({
-      data: {
-        name: '테스트학생',
-        grade: '1',
-        class: '1',
-        birthDate: '20100101',
-        phoneNumber: '010-0000-0000',
-        schoolId: school.id,
-        useYn: 'Y'
-      }
+    const testToken = '644b664f-f02e-49a3-bd09-aa3723e55d7b'
+    let student = await prisma.students.findUnique({
+      where: { token: testToken }
     })
+
+    if (!student) {
+      student = await prisma.students.create({
+        data: {
+          name: '테스트학생',
+          grade: '1',
+          class: '1',
+          birthDate: '20100101',
+          phoneNumber: '010-0000-0000',
+          schoolId: school.id,
+          token: testToken,
+          useYn: 'Y'
+        }
+      })
+    }
 
     console.log('--- Seeded successfully ---')
     console.log('Admin User:', user.loginId)

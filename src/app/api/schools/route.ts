@@ -15,24 +15,45 @@ export async function GET() {
     }
 
     const schools = await prisma.schools.findMany({
-      select: {
-        id: true,
-        seq: true,
-        yearMonth: true,
-        schoolName: true,
-        userId: true,
-        useYn: true,
-        createdAt: true,
-      },
       where: {
         useYn: 'Y'
+      },
+      include: {
+        _count: {
+          select: { students: true }
+        },
+        students: {
+          where: {
+            measurement: {
+              is: {
+                status: 'measured'
+              }
+            }
+          },
+          select: {
+            id: true
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
       }
     });
 
-    return NextResponse.json(schools);
+    const result = schools.map(school => ({
+      id: school.id,
+      seq: school.seq,
+      yearMonth: school.yearMonth,
+      schoolName: school.schoolName,
+      userId: school.userId,
+      useYn: school.useYn,
+      status: school.status,
+      createdAt: school.createdAt,
+      studentCount: school._count.students,
+      measuredCount: school.students.length
+    }));
+
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error("Schools API Error:", error);

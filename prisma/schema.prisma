@@ -22,6 +22,7 @@ model Schools {
   managerContact String?   @db.VarChar(50)    // 담당자 연락처 추가
   userId         Int       @map("user_id")
   useYn          String    @default("Y")
+  status         String    @default("active") // active | closed
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @default(now()) @updatedAt
   
