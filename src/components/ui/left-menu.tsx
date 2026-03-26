@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, School, ChevronRight } from "lucide-react";
+import { LayoutDashboard, School, ChevronRight, UserCircle } from "lucide-react";
+import { AccountButton } from "./account-button";
 
 const navItems = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
@@ -49,8 +50,13 @@ export function LeftMenu() {
         })}
       </nav>
 
+      {/* 하단 사용자 정보 및 로그아웃 */}
+      <div className="px-3 py-4 border-t border-white/10">
+        <AccountButton />
+      </div>
+
       {/* 하단 버전 뱃지 */}
-      <div className="px-6 py-4 border-t border-white/10">
+      <div className="px-6 py-2">
         <span className="text-[10px] text-white/30 font-mono">v1.0.0-beta</span>
       </div>
     </div>

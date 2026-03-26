@@ -23,7 +23,7 @@ export default function MainLayout({
             <div className="flex justify-between items-center px-6 h-16">
               {/* 페이지 브레드크럼 영역 (여백) */}
               <div />
-              <AccountButton />
+              {/* AccountButton moved to LeftMenu */}
             </div>
           </header>
           <main className="flex-1 p-6 bg-gray-50">

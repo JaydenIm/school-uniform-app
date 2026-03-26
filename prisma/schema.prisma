@@ -108,6 +108,7 @@ model Users {
   name        String   @db.VarChar(50)
   phoneNumber String?  @db.VarChar(20)
   email       String   @unique @db.VarChar(100)
+  image       String?  @db.LongText               // 프로필 이미지 URL 또는 Base64
   useYn       String   @default("Y") @db.Char(1)
   createdAt   DateTime @default(now()) @updatedAt
   updatedAt   DateTime @default(now()) @updatedAt
