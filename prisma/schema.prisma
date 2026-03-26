@@ -13,20 +13,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Stores {
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(100)   // 업체/매장명
+  roadAddress    String    @db.VarChar(200)   // 도로명 주소
+  detailAddress  String    @db.VarChar(100)   // 상세 주소
+  phoneNumber    String?   @db.VarChar(20)    // 매장 연락처
+  userId         Int       @map("user_id")
+  useYn          String    @default("Y") @db.Char(1)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+
+  user           Users     @relation(fields: [userId], references: [id])
+  schools        Schools[]
+
+  @@map("stores")
+}
+
 model Schools {
   id             Int       @id @default(autoincrement())
   seq            String
   schoolName     String
   yearMonth      String
-  address        String?   @db.VarChar(200)   // 주소 추가
-  managerContact String?   @db.VarChar(50)    // 담당자 연락처 추가
+  address        String?   @db.VarChar(200)   // (구) 주소 필드 - 하위 호환성 유지
+  managerContact String?   @db.VarChar(50)    // (구) 담당자 연락처
   userId         Int       @map("user_id")
+  storeId        Int?      @map("store_id")   // 담당 매장 ID
   useYn          String    @default("Y")
   status         String    @default("active") // active | closed
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @default(now()) @updatedAt
   
   users      Users     @relation(fields: [userId], references: [id])
+  store      Stores?    @relation(fields: [storeId], references: [id])
   students   Students[]
 
   @@map("schools")
@@ -93,6 +112,7 @@ model Users {
   createdAt   DateTime @default(now()) @updatedAt
   updatedAt   DateTime @default(now()) @updatedAt
   schools     Schools[]
+  stores      Stores[]
 
   @@index([name])
   @@index([phoneNumber])

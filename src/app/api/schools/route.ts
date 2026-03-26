@@ -19,6 +19,7 @@ export async function GET() {
         useYn: 'Y'
       },
       include: {
+        store: true, // 매장 정보 포함
         _count: {
           select: { students: true }
         },
@@ -46,6 +47,8 @@ export async function GET() {
       yearMonth: school.yearMonth,
       schoolName: school.schoolName,
       userId: school.userId,
+      storeId: school.storeId,
+      storeName: school.store?.name || '미배정', // 매장명 추가
       useYn: school.useYn,
       status: school.status,
       createdAt: school.createdAt,
@@ -79,21 +82,18 @@ export async function POST(request: Request) {
     console.log('Received body:', body);
     
     // 필수 필드 검증
-    if (!body.yearMonth || !body.schoolName) {
+    if (!body.yearMonth || !body.schoolName || !body.storeId) {
       return NextResponse.json(
-        { error: "필수 입력값이 누락되었습니다." },
+        { error: "필수 입력값(년월, 학교명, 매장선택)이 누락되었습니다." },
         { status: 400 }
       );
     }
 
-    // seq 자동 생성 로직
+    // seq 자동 생성 로직 (생략 - 기존 로직 유지)
+    // ...
     const lastSchool = await prisma.schools.findFirst({
-      where: {
-        yearMonth: body.yearMonth,
-      },
-      orderBy: {
-        seq: 'desc',
-      },
+      where: { yearMonth: body.yearMonth },
+      orderBy: { seq: 'desc' },
     });
 
     let nextSeq = body.yearMonth + '00001';
@@ -107,9 +107,8 @@ export async function POST(request: Request) {
         seq: nextSeq,
         yearMonth: body.yearMonth,
         schoolName: body.schoolName,
-        address: body.address || null,
-        managerContact: body.managerContact || null,
         userId: parseInt(session.user.id),
+        storeId: parseInt(body.storeId), // 매장 ID 연결
         useYn: 'Y'
       }
     });
