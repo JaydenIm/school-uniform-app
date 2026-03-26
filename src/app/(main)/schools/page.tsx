@@ -78,63 +78,8 @@ export default function SchoolsPage() {
     dueDate: '2025-03-31'
   });
 
-  // 매장 및 학교 등록용 상태
-  const [stores, setStores] = useState<any[]>([]);
-  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
-  const [isSchoolModalOpen, setIsSchoolModalOpen] = useState(false);
-  const [newStore, setNewStore] = useState({ name: '', roadAddress: '', detailAddress: '', phoneNumber: '' });
-  const [newSchool, setNewSchool] = useState({ schoolName: '', yearMonth: '', storeId: '' });
+  // SMS 모달 상태
 
-  useEffect(() => {
-    fetchStores();
-  }, []);
-
-  const fetchStores = async () => {
-    try {
-      const res = await fetch('/api/stores');
-      const data = await res.json();
-      if (data.stores) setStores(data.stores);
-    } catch (error) {
-      console.error('Fetch stores error:', error);
-    }
-  };
-
-  const handleAddStore = async () => {
-    try {
-      const res = await fetch('/api/stores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newStore),
-      });
-      if (!res.ok) throw new Error('매장 등록 실패');
-      toast.success('매장이 성공적으로 등록되었습니다.');
-      setIsStoreModalOpen(false);
-      setNewStore({ name: '', roadAddress: '', detailAddress: '', phoneNumber: '' });
-      fetchStores();
-    } catch {
-      toast.error('매장 등록 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleAddSchool = async () => {
-    try {
-      const res = await fetch('/api/schools', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSchool),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || '학교 등록 실패');
-      }
-      toast.success('학교가 성공적으로 등록되었습니다.');
-      setIsSchoolModalOpen(false);
-      setNewSchool({ schoolName: '', yearMonth: '', storeId: '' });
-      fetchSchools(); // 기존 fetchSchools 함수 호출
-    } catch (e: any) {
-      toast.error(e.message || '학교 등록 중 오류가 발생했습니다.');
-    }
-  };
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -230,7 +175,7 @@ export default function SchoolsPage() {
           <li>학교 관리</li>
           <li className="flex items-center">
             <ChevronRight className="w-3 h-3 mx-1" />
-            <span className="text-gray-900 font-semibold">목록</span>
+            <span className="text-gray-900 font-semibold">측정 현황 및 발송</span>
           </li>
         </ol>
       </nav>
@@ -238,20 +183,20 @@ export default function SchoolsPage() {
       {/* 헤더 */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">학교 관리</h1>
-          <p className="text-gray-500 mt-1">등록된 학교의 치수 측정 현황을 관리하고 안내 문자를 발송합니다.</p>
+          <h1 className="text-3xl font-bold tracking-tight">측정 현황 및 발송</h1>
+          <p className="text-gray-500 mt-1">학생들의 치수 측정 진행률을 확인하고 안내 문자를 발송합니다.</p>
         </div>
         <div className="flex gap-3">
           <Button 
             variant="outline"
             className="border-purple-200 text-purple-700 font-bold rounded-xl h-11 px-5 hover:bg-purple-50"
-            onClick={() => setIsStoreModalOpen(true)}
+            onClick={() => router.push('/schools?manageStores=true')}
           >
             <StoreIcon className="mr-2 w-4 h-4" /> 매장 관리
           </Button>
           <Button 
             className="bg-purple-800 text-white font-bold rounded-xl h-11 px-5 hover:bg-purple-900 shadow-lg shadow-purple-200"
-            onClick={() => setIsSchoolModalOpen(true)}
+            onClick={() => router.push('/schools/register')}
           >
             <PlusCircle className="mr-2 w-4 h-4" /> 학교 신규 등록
           </Button>
@@ -372,105 +317,8 @@ export default function SchoolsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 매장 등록 모달 */}
-      <Dialog open={isStoreModalOpen} onOpenChange={setIsStoreModalOpen}>
-        <DialogContent className="max-w-md bg-white rounded-3xl p-6 overflow-hidden border-none shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black flex items-center gap-2">
-              <StoreIcon className="w-5 h-5 text-purple-700" /> 매장 신규 등록
-            </DialogTitle>
-            <DialogDescription>
-              오프라인 매장 정보를 입력해 주세요.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-500">매장명 (업체명)</Label>
-              <Input 
-                value={newStore.name} 
-                onChange={e => setNewStore(p => ({ ...p, name: e.target.value }))}
-                placeholder="예: 온핏 청담점"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-500">도로명 주소</Label>
-              <Input 
-                value={newStore.roadAddress} 
-                onChange={e => setNewStore(p => ({ ...p, roadAddress: e.target.value }))}
-                placeholder="예: 서울특별시 강남구..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-400">상세 주소</Label>
-              <Input 
-                value={newStore.detailAddress} 
-                onChange={e => setNewStore(p => ({ ...p, detailAddress: e.target.value }))}
-                placeholder="예: 2층"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-500">연락처</Label>
-              <Input 
-                value={newStore.phoneNumber} 
-                onChange={e => setNewStore(p => ({ ...p, phoneNumber: e.target.value }))}
-                placeholder="예: 02-1234-5678"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleAddStore} className="w-full bg-purple-800 text-white font-bold h-12 rounded-xl">등록 완료</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* 학교 등록 모달 */}
-      <Dialog open={isSchoolModalOpen} onOpenChange={setIsSchoolModalOpen}>
-        <DialogContent className="max-w-md bg-white rounded-3xl p-6 overflow-hidden border-none shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black flex items-center gap-2">
-              <PlusCircle className="w-5 h-5 text-purple-700" /> 학교 신규 등록
-            </DialogTitle>
-            <DialogDescription>
-              담당 매장을 지정하고 학교 정보를 입력하세요.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-500">담당 매장 선택</Label>
-              <Select onValueChange={v => setNewSchool(p => ({ ...p, storeId: v }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="매장을 선택해 주세요" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  {stores.map(s => (
-                    <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
-                  ))}
-                  {stores.length === 0 && <SelectItem value="none" disabled>먼저 매장을 등록해 주세요</SelectItem>}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-500">학교명</Label>
-              <Input 
-                value={newSchool.schoolName} 
-                onChange={e => setNewSchool(p => ({ ...p, schoolName: e.target.value }))}
-                placeholder="예: 온핏고등학교"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-gray-500">등록 년월 (6자리)</Label>
-              <Input 
-                value={newSchool.yearMonth} 
-                onChange={e => setNewSchool(p => ({ ...p, yearMonth: e.target.value }))}
-                placeholder="예: 202503"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleAddSchool} className="w-full bg-purple-800 text-white font-bold h-12 rounded-xl">학교 등록</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
 
       {schools.length > 0 ? (
         /* 2단 그리드: 학교 목록(1/3) + 학생 목록(2/3) */

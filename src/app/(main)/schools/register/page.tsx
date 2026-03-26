@@ -7,9 +7,24 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { ArrowRight, Upload, Download, CheckCircle2 } from "lucide-react"
+import { ArrowRight, Upload, Download, CheckCircle2, Store, PlusCircle, MapPin, Phone } from "lucide-react"
 import * as XLSX from 'xlsx-js-style'
 import { saveAs } from 'file-saver'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function CreateSchool() {
   const router = useRouter()
@@ -21,11 +36,17 @@ export default function CreateSchool() {
     yearMonth: new Date().toISOString().slice(0, 7).replace(/-/g, ''),
     address: '',
     managerContact: '',
+    storeId: '',
   })
+  const [stores, setStores] = useState<any[]>([])
   const [schoolId, setSchoolId] = useState<number | null>(null)
   const [students, setStudents] = useState<any[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false)
+
+  // 매장 등록 모달 상태
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false)
+  const [newStore, setNewStore] = useState({ name: '', roadAddress: '', detailAddress: '', phoneNumber: '' })
 
   // 초기 로드 시 sessionStorage에서 데이터 복구
   useEffect(() => {
@@ -35,6 +56,7 @@ export default function CreateSchool() {
     if (savedStep) setStep(parseInt(savedStep));
     if (savedSchoolId) setSchoolId(parseInt(savedSchoolId));
     if (savedFormData) setFormData(JSON.parse(savedFormData));
+    fetchStores()
   }, []);
 
   // 상태 변경 시 sessionStorage 동기화
@@ -44,14 +66,57 @@ export default function CreateSchool() {
     sessionStorage.setItem('register_formData', JSON.stringify(formData));
   }, [step, schoolId, formData]);
 
+  const fetchStores = async () => {
+    try {
+      const res = await fetch('/api/stores')
+      const data = await res.json()
+      if (data.stores) setStores(data.stores)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleAddStore = async () => {
+    if (!newStore.name || !newStore.roadAddress) {
+      toast.error("매장명과 주소는 필수입니다.")
+      return
+    }
+    setIsLoading(true)
+    try {
+      const res = await fetch('/api/stores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newStore),
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || '매장 등록 실패')
+      
+      toast.success('매장이 성공적으로 등록되었습니다.')
+      setIsStoreModalOpen(false)
+      setNewStore({ name: '', roadAddress: '', detailAddress: '', phoneNumber: '' })
+      
+      // 목록 갱신 및 신규 매장 자동 선택
+      const freshStoresRes = await fetch('/api/stores')
+      const freshData = await freshStoresRes.json()
+      if (freshData.stores) {
+        setStores(freshData.stores)
+        setFormData(p => ({ ...p, storeId: result.store.id.toString() }))
+      }
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // 세션 체크
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') router.push('/login');
   }, [sessionStatus, router]);
 
   const handleNextStep = async () => {
-    if (!formData.schoolName || !formData.yearMonth) {
-      toast.error("학교명과 등록년월은 필수입니다.")
+    if (!formData.schoolName || !formData.yearMonth || !formData.storeId) {
+      toast.error("학교명, 등록년월, 담당 매장은 필수입니다.")
       return
     }
     setIsLoading(true)
@@ -87,9 +152,6 @@ export default function CreateSchool() {
         const sheet = workbook.Sheets[sheetName]
         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[]
 
-        console.log('Raw Excel Data:', jsonData)
-
-        // 헤더 행 건너뛰기 (첫 번째 열이 '학생명' 또는 '이름'인 행)
         const startIndex = jsonData.findIndex(row => row && row[0] && row[0] !== '학생명' && row[0] !== '이름')
         const dataRows = startIndex !== -1 ? jsonData.slice(startIndex) : jsonData.slice(1)
 
@@ -253,6 +315,38 @@ export default function CreateSchool() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2 col-span-2">
+                <div className="flex justify-between items-center">
+                  <Label className="text-sm font-semibold">담당 매장 <span className="text-red-500">*</span></Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-xs text-purple-600 hover:text-purple-700 font-bold"
+                    onClick={() => setIsStoreModalOpen(true)}
+                  >
+                    <PlusCircle className="mr-1 w-3 h-3" /> 신규 매장 추가
+                  </Button>
+                </div>
+                <Select 
+                  value={formData.storeId} 
+                  onValueChange={v => setFormData(p => ({ ...p, storeId: v }))}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="학교를 관리할 매장을 선택해 주세요" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {stores.map(s => (
+                      <SelectItem key={s.id} value={s.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          <Store className="w-3.5 h-3.5 text-purple-600" />
+                          <span>{s.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                    {stores.length === 0 && <SelectItem value="none" disabled>먼저 매장을 등록해 주세요</SelectItem>}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2 col-span-2 sm:col-span-1">
                 <Label htmlFor="schoolName" className="text-sm font-semibold">학교명 <span className="text-red-500">*</span></Label>
                 <Input
@@ -406,6 +500,72 @@ export default function CreateSchool() {
           </CardContent>
         </Card>
       )}
+      {/* 매장 등록 모달 */}
+      <Dialog open={isStoreModalOpen} onOpenChange={setIsStoreModalOpen}>
+        <DialogContent className="max-w-md bg-white rounded-3xl p-6 overflow-hidden border-none shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black flex items-center gap-2">
+              <Store className="w-5 h-5 text-purple-700" /> 매장 신규 등록
+            </DialogTitle>
+            <DialogDescription>
+              오프라인 매장 정보를 입력해 주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-500">매장명 (업체명)</Label>
+              <Input 
+                value={newStore.name} 
+                onChange={e => setNewStore(p => ({ ...p, name: e.target.value }))}
+                placeholder="예: 온핏 청담점"
+                className="h-11"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-500">도로명 주소</Label>
+              <div className="relative">
+                <Input 
+                  value={newStore.roadAddress} 
+                  onChange={e => setNewStore(p => ({ ...p, roadAddress: e.target.value }))}
+                  placeholder="예: 서울특별시 강남구..."
+                  className="h-11 pl-10"
+                />
+                <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-400">상세 주소</Label>
+              <Input 
+                value={newStore.detailAddress} 
+                onChange={e => setNewStore(p => ({ ...p, detailAddress: e.target.value }))}
+                placeholder="예: 2층"
+                className="h-11"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-500">연락처</Label>
+              <div className="relative">
+                <Input 
+                  value={newStore.phoneNumber} 
+                  onChange={e => setNewStore(p => ({ ...p, phoneNumber: e.target.value }))}
+                  placeholder="예: 02-1234-5678"
+                  className="h-11 pl-10"
+                />
+                <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="pt-4">
+            <Button 
+              onClick={handleAddStore} 
+              disabled={isLoading}
+              className="w-full bg-purple-800 text-white font-bold h-12 rounded-xl hover:bg-purple-900"
+            >
+              {isLoading ? "등록 중..." : "등록 완료"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -6,7 +6,8 @@ import { LayoutDashboard, School, ChevronRight } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
-  { href: "/schools", label: "학교 관리", icon: School },
+  { href: "/schools", label: "측정 현황 및 발송", icon: School },
+  { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight },
 ];
 
 export function LeftMenu() {
