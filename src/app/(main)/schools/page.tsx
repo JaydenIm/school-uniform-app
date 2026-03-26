@@ -7,11 +7,21 @@ import { toast } from "sonner";
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { DataTable } from "@/components/ui/data-table";
-import { columns, Student } from "./columns";
-import { PlusCircle, School as SchoolIcon, ChevronRight, LayoutGrid, ListFilter, Users, CheckCircle, Info, SendIcon } from 'lucide-react';
+import { getColumns, Student } from "./columns";
+import { PlusCircle, School as SchoolIcon, ChevronRight, LayoutGrid, ListFilter, Users, CheckCircle, Info, SendIcon, Copy, MapPin, Phone, Calendar } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface School {
   id: number;
@@ -41,6 +51,16 @@ export default function SchoolsPage() {
   const [selectedSchoolId, setSelectedSchoolId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isStudentsLoading, setIsStudentsLoading] = useState(false);
+
+  // SMS 모달 상태
+  const [isSmsModalOpen, setIsSmsModalOpen] = useState(false);
+  const [smsInfo, setSmsInfo] = useState({
+    companyName: '온핏 유니폼',
+    address: '서울특별시 강남구 테헤란로 123',
+    detailAddress: '온핏빌딩 5층',
+    contact: '02-1234-5678',
+    dueDate: '2025-03-31'
+  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -100,6 +120,24 @@ export default function SchoolsPage() {
     }
   };
 
+  const onCopySms = (student: Student) => {
+    if (!student.token) return;
+    
+    const measureUrl = `${window.location.origin}/measure/${student.token}`;
+    const message = `[온핏 시스템 안내]\n\n` +
+      `안녕하세요, ${selectedSchool?.schoolName} 학생 여러분.\n` +
+      `${smsInfo.companyName}입니다.\n\n` +
+      `교복 치수 측정을 위해 아래 기간 내 매장을 방문해 주시기 바랍니다.\n\n` +
+      `📍 주소: ${smsInfo.address} ${smsInfo.detailAddress}\n` +
+      `📞 연락처: ${smsInfo.contact}\n` +
+      `🗓️ 방문기한: ${smsInfo.dueDate}까지\n\n` +
+      `🔗 나만의 측정 링크:\n` +
+      `${measureUrl}`;
+    
+    navigator.clipboard.writeText(message);
+    toast.success(`${student.name} 학생의 안내 문구를 복사했습니다.`);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -138,6 +176,120 @@ export default function SchoolsPage() {
           <PlusCircle className="mr-2 w-4 h-4" /> 학교 신규 등록
         </Button>
       </div>
+
+      {/* SMS 발송 모달 */}
+      <Dialog open={isSmsModalOpen} onOpenChange={setIsSmsModalOpen}>
+        <DialogContent className="max-w-2xl bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          <div className="bg-gradient-to-br from-purple-800 to-indigo-900 p-8 text-white relative">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black flex items-center gap-2 text-white">
+                <SendIcon className="w-6 h-6" /> QR/안내 문자 생성
+              </DialogTitle>
+              <DialogDescription className="text-purple-200 font-medium">
+                안내 문구에 포함될 업체 정보와 마감 기한을 입력해 주세요.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <div className="p-8 grid grid-cols-2 gap-8">
+            {/* 왼쪽: 정보 입력 */}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400">업체명</Label>
+                <div className="relative">
+                  <Input 
+                    value={smsInfo.companyName} 
+                    onChange={e => setSmsInfo(p => ({ ...p, companyName: e.target.value }))}
+                    className="h-11 pl-10 border-gray-100 bg-gray-50/50 rounded-xl focus:ring-purple-500"
+                  />
+                  <SchoolIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400">도로명 주소</Label>
+                <div className="relative">
+                  <Input 
+                    value={smsInfo.address} 
+                    onChange={e => setSmsInfo(p => ({ ...p, address: e.target.value }))}
+                    className="h-11 pl-10 border-gray-100 bg-gray-50/50 rounded-xl focus:ring-purple-500"
+                  />
+                  <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400">상세 주소</Label>
+                <Input 
+                  value={smsInfo.detailAddress} 
+                  onChange={e => setSmsInfo(p => ({ ...p, detailAddress: e.target.value }))}
+                  className="h-11 border-gray-100 bg-gray-50/50 rounded-xl focus:ring-purple-500"
+                  placeholder="예: 2층 온핏 매장"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-gray-400">연락처</Label>
+                  <div className="relative">
+                    <Input 
+                      value={smsInfo.contact} 
+                      onChange={e => setSmsInfo(p => ({ ...p, contact: e.target.value }))}
+                      className="h-11 pl-10 border-gray-100 bg-gray-50/50 rounded-xl focus:ring-purple-500"
+                    />
+                    <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-gray-400">방문 기한</Label>
+                  <div className="relative">
+                    <Input 
+                      type="date"
+                      value={smsInfo.dueDate} 
+                      onChange={e => setSmsInfo(p => ({ ...p, dueDate: e.target.value }))}
+                      className="h-11 pl-10 border-gray-100 bg-gray-50/50 rounded-xl focus:ring-purple-500"
+                    />
+                    <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 오른쪽: 미리보기 */}
+            <div className="bg-gray-50 rounded-2xl p-6 space-y-3 border border-gray-100 flex flex-col">
+              <Label className="text-xs font-bold text-gray-400 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> 메시지 미리보기
+              </Label>
+              <div className="flex-1 bg-white border border-gray-100 rounded-xl p-4 text-[13px] leading-relaxed text-gray-600 font-medium font-mono whitespace-pre-wrap overflow-auto">
+                {`[온핏 시스템 안내]\n\n`}
+                {`안녕하세요, ${selectedSchool?.schoolName} 학생 여러분.\n`}
+                {`${smsInfo.companyName}입니다.\n\n`}
+                {`교복 치수 측정을 위해 아래 기간 내 매장을 방문해 주시기 바랍니다.\n\n`}
+                {`📍 주소: ${smsInfo.address} ${smsInfo.detailAddress}\n`}
+                {`📞 연락처: ${smsInfo.contact}\n`}
+                {`🗓️ 방문기한: ${smsInfo.dueDate}까지\n\n`}
+                {`🔗 나만의 측정 링크:\n`}
+                {`http://localhost:3000/measure/[학생고유번호]`}
+              </div>
+              <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2 rounded-lg">
+                ※ 실제 발송 시 [학생고유번호] 자리에 각 학생별 자동 생성된 링크가 삽입됩니다.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="p-8 bg-gray-50/50 border-t border-gray-100 sm:justify-start">
+            <Button 
+              className="bg-purple-800 text-white rounded-xl h-12 px-8 font-bold hover:bg-purple-900 transition-all"
+              onClick={() => {
+                toast.success('설정이 저장되었습니다. 이제 학생별로 문구를 복사할 수 있습니다.');
+                setIsSmsModalOpen(false);
+              }}
+            >
+              설정 완료
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {schools.length > 0 ? (
         /* 2단 그리드: 학교 목록(1/3) + 학생 목록(2/3) */
@@ -245,7 +397,12 @@ export default function SchoolsPage() {
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="h-10 text-xs font-bold border-gray-200 hover:bg-gray-50">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-10 text-xs font-bold border-gray-200 hover:bg-gray-50"
+                        onClick={() => setIsSmsModalOpen(true)}
+                      >
                         <SendIcon className="w-3.5 h-3.5 mr-2 text-purple-600" /> QR/문자 발송
                       </Button>
                       <Button 
@@ -292,7 +449,7 @@ export default function SchoolsPage() {
                         </div>
                       ) : (
                         <DataTable
-                          columns={columns}
+                          columns={getColumns(onCopySms)}
                           data={students}
                           placeholder="등록된 학생이 없습니다."
                         />

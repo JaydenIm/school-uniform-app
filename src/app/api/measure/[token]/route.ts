@@ -41,11 +41,20 @@ export async function POST(
 
     const body = await request.json()
     const {
+      gender,
       shoulder, chest, upperLength, sleeveLength,
       waist, hip, thigh, pantsLength,
       qtyHoodie, qtyTshirt, qtyPolo, qtySweater,
       note,
     } = body
+
+    // 성별이 넘어왔고, 학생 정보에 성별이 없거나 다를 경우 업데이트
+    if (gender && student.gender !== gender) {
+      await prisma.students.update({
+        where: { id: student.id },
+        data: { gender }
+      })
+    }
 
     const measurement = await prisma.measurement.upsert({
       where: { studentId: student.id },
