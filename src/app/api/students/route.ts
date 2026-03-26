@@ -74,7 +74,8 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         birthDate: true,
-        phoneNumber: true
+        phoneNumber: true,
+        token: true
       }
     })
 

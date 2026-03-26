@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 
 // GET /api/measure/[token] — 학생 정보 + 기존 치수 조회 (인증 불필요)
 export async function GET(
