@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, School, ChevronRight, UserCircle } from "lucide-react";
+import { LayoutDashboard, School, ChevronRight, UserCircle, Store } from "lucide-react";
 import { AccountButton } from "./account-button";
 
 const navItems = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
   { href: "/schools", label: "측정 현황 및 발송", icon: School },
   { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight },
+  { href: "/stores", label: "매장 관리", icon: Store },
 ];
 
 export function LeftMenu() {

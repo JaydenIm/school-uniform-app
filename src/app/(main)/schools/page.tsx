@@ -190,7 +190,7 @@ export default function SchoolsPage() {
           <Button 
             variant="outline"
             className="border-purple-200 text-purple-700 font-bold rounded-xl h-11 px-5 hover:bg-purple-50"
-            onClick={() => router.push('/schools?manageStores=true')}
+            onClick={() => router.push('/stores')}
           >
             <StoreIcon className="mr-2 w-4 h-4" /> 매장 관리
           </Button>
