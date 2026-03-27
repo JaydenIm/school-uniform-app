@@ -76,7 +76,7 @@ export default function SchoolsPage() {
 
   // 필터 상태
   const currentYear = new Date().getFullYear();
-  const [filterYear, setFilterYear] = useState<string>('all');
+  const [filterYear, setFilterYear] = useState<string>(currentYear.toString());
   const [filterSemester, setFilterSemester] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -215,13 +215,6 @@ export default function SchoolsPage() {
           <p className="text-gray-500 mt-1">학생들의 치수 측정 진행률을 확인하고 안내 문자를 발송합니다.</p>
         </div>
         <div className="flex gap-3">
-          <Button 
-            variant="outline"
-            className="border-purple-200 text-purple-700 font-bold rounded-xl h-11 px-5 hover:bg-purple-50"
-            onClick={() => router.push('/stores')}
-          >
-            <StoreIcon className="mr-2 w-4 h-4" /> 매장 관리
-          </Button>
           <Button 
             className="bg-purple-800 text-white font-bold rounded-xl h-11 px-5 hover:bg-purple-900 shadow-lg shadow-purple-200"
             onClick={() => router.push('/schools/register')}
