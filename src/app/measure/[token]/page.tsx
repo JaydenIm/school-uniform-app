@@ -168,7 +168,11 @@ export default function MeasurePage() {
 
   const { school } = student
   const ym = school?.yearMonth || ''
-  const ymLabel = ym.length === 6 ? `${ym.slice(0, 4)}년 ${ym.slice(4)}월` : ym
+  const ymLabel = ym.length === 5 
+    ? `${ym.slice(0, 4)}년 ${ym.slice(4)}학기`
+    : ym.length === 6 
+      ? `${ym.slice(0, 4)}년 ${ym.slice(4)}월` 
+      : ym
 
   // --- 1단계: 본인 인증 화면 ---
   if (step === 'VERIFY') {

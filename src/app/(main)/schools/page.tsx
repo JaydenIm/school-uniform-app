@@ -52,10 +52,16 @@ interface School {
   measuredCount: number;
 }
 
-/** yearMonth(YYYYMM) → 'YYYY년 MM월' */
+/** yearMonth(YYYYMM 또는 YYYYS) → 'YYYY년 MM월' 또는 'YYYY년 S학기' */
 function formatYearMonth(ym: string): string {
-  if (!ym || ym.length !== 6) return ym;
-  return `${ym.slice(0, 4)}년 ${ym.slice(4)}월`;
+  if (!ym) return ym;
+  if (ym.length === 5) {
+    return `${ym.slice(0, 4)}년 ${ym.slice(4)}학기`;
+  }
+  if (ym.length === 6) {
+    return `${ym.slice(0, 4)}년 ${ym.slice(4)}월`;
+  }
+  return ym;
 }
 
 export default function SchoolsPage() {
@@ -67,6 +73,21 @@ export default function SchoolsPage() {
   const [selectedSchoolId, setSelectedSchoolId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isStudentsLoading, setIsStudentsLoading] = useState(false);
+
+  // 필터 상태
+  const currentYear = new Date().getFullYear();
+  const [filterYear, setFilterYear] = useState<string>('all');
+  const [filterSemester, setFilterSemester] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  // 필터링된 학교 목록 계산
+  const filteredSchools = schools.filter(school => {
+    const matchYear = filterYear === 'all' || school.yearMonth.startsWith(filterYear);
+    // 학기는 yearMonth가 5자리일 때 마지막 자리와 비교
+    const matchSemester = filterSemester === 'all' || (school.yearMonth.length === 5 && school.yearMonth.endsWith(filterSemester));
+    const matchStatus = filterStatus === 'all' || school.status === filterStatus;
+    return matchYear && matchSemester && matchStatus;
+  });
 
   // SMS 모달 상태
   const [isSmsModalOpen, setIsSmsModalOpen] = useState(false);
@@ -97,13 +118,20 @@ export default function SchoolsPage() {
       const idNum = Number(newId);
       if (selectedSchoolId !== idNum) setSelectedSchoolId(idNum);
       router.replace('/schools', { scroll: false });
-    } else if (schools.length > 0 && selectedSchoolId === null) {
-      setSelectedSchoolId(schools[0].id);
+    } else if (filteredSchools.length > 0) {
+      // 선택된 학교가 없거나, 현재 필터링된 목록에 없으면 첫 번째 항목 선택
+      const isStillVisible = filteredSchools.some(s => s.id === selectedSchoolId);
+      if (!selectedSchoolId || !isStillVisible) {
+        setSelectedSchoolId(filteredSchools[0].id);
+      }
+    } else {
+      setSelectedSchoolId(null);
     }
-  }, [schools, selectedSchoolId, searchParams, router]);
+  }, [schools, filteredSchools, selectedSchoolId, searchParams, router]);
 
   useEffect(() => {
     if (selectedSchoolId) fetchStudents(selectedSchoolId);
+    else setStudents([]);
   }, [selectedSchoolId]);
 
   const fetchSchools = async () => {
@@ -325,15 +353,56 @@ export default function SchoolsPage() {
         <div className="grid grid-cols-3 gap-6 items-start">
           {/* 왼쪽: 학교 목록 */}
           <div className="col-span-1 space-y-4">
+            {/* 필터 영역 */}
+            <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-3">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <ListFilter className="w-3.5 h-3.5" />
+                <span className="text-[11px] font-bold uppercase tracking-wider">상세 필터링</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={filterYear} onValueChange={setFilterYear}>
+                  <SelectTrigger className="h-9 text-xs bg-white border-none shadow-sm rounded-lg">
+                    <SelectValue placeholder="년도" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all">전체 년도</SelectItem>
+                    {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(y => (
+                      <SelectItem key={y} value={y.toString()}>{y}년</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={filterSemester} onValueChange={setFilterSemester}>
+                  <SelectTrigger className="h-9 text-xs bg-white border-none shadow-sm rounded-lg">
+                    <SelectValue placeholder="학기" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all">전체 학기</SelectItem>
+                    <SelectItem value="1">1학기</SelectItem>
+                    <SelectItem value="2">2학기</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="h-9 text-xs bg-white border-none shadow-sm rounded-lg">
+                  <SelectValue placeholder="진행 상태" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="all">전체 상태</SelectItem>
+                  <SelectItem value="active">진행 중 (Active)</SelectItem>
+                  <SelectItem value="closed">마감 (Closed)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center justify-between px-1">
               <h2 className="text-sm font-bold flex items-center text-gray-700">
-                <ListFilter className="w-4 h-4 mr-2" /> 학교 목록
+                <SchoolIcon className="w-4 h-4 mr-2" /> 학교 목록
               </h2>
-              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">총 {schools.length}개</span>
+              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">검색 {filteredSchools.length} / 총 {schools.length}</span>
             </div>
             
             <div className="space-y-3 overflow-auto max-h-[700px] pr-1">
-              {schools.map((school) => {
+              {filteredSchools.map((school) => {
                 const progress = school.studentCount > 0 ? (school.measuredCount / school.studentCount) * 100 : 0;
                 const isSelected = selectedSchoolId === school.id;
                 

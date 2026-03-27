@@ -31,13 +31,30 @@ export default function CreateSchool() {
   const { status: sessionStatus } = useSession();
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
     schoolName: '',
-    yearMonth: new Date().toISOString().slice(0, 7).replace(/-/g, ''),
+    yearMonth: `${currentYear}1`,
     address: '',
     managerContact: '',
     storeId: '',
   })
+  
+  // 년도/학기 개별 상태 (UI 바인딩용)
+  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
+  const [selectedSemester, setSelectedSemester] = useState('1');
+
+  // UI에서 직접 호출할 변경 함수
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    setFormData(p => ({ ...p, yearMonth: year + selectedSemester }));
+  };
+
+  const handleSemesterChange = (semester: string) => {
+    setSelectedSemester(semester);
+    setFormData(p => ({ ...p, yearMonth: selectedYear + semester }));
+  };
+
   const [stores, setStores] = useState<any[]>([])
   const [schoolId, setSchoolId] = useState<number | null>(null)
   const [students, setStudents] = useState<any[]>([])
@@ -55,7 +72,14 @@ export default function CreateSchool() {
     const savedFormData = sessionStorage.getItem('register_formData');
     if (savedStep) setStep(parseInt(savedStep));
     if (savedSchoolId) setSchoolId(parseInt(savedSchoolId));
-    if (savedFormData) setFormData(JSON.parse(savedFormData));
+    if (savedFormData) {
+      const parsed = JSON.parse(savedFormData);
+      setFormData(parsed);
+      if (parsed.yearMonth && parsed.yearMonth.length === 5) {
+        setSelectedYear(parsed.yearMonth.slice(0, 4));
+        setSelectedSemester(parsed.yearMonth.slice(4));
+      }
+    }
     fetchStores()
   }, []);
 
@@ -358,14 +382,28 @@ export default function CreateSchool() {
                 />
               </div>
               <div className="space-y-2 col-span-2 sm:col-span-1">
-                <Label htmlFor="yearMonth" className="text-sm font-semibold">등록년월 <span className="text-red-500">*</span></Label>
-                <Input
-                  id="yearMonth"
-                  type="month"
-                  value={formData.yearMonth.length === 6 ? formData.yearMonth.slice(0, 4) + '-' + formData.yearMonth.slice(4) : ''}
-                  onChange={e => setFormData(p => ({ ...p, yearMonth: e.target.value.replace(/-/g, '') }))}
-                  className="h-11"
-                />
+                <Label className="text-sm font-semibold">년도/학기 <span className="text-red-500">*</span></Label>
+                <div className="flex gap-2">
+                  <Select value={selectedYear} onValueChange={handleYearChange}>
+                    <SelectTrigger className="h-11 flex-1">
+                      <SelectValue placeholder="년도" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(year => (
+                        <SelectItem key={year} value={year.toString()}>{year}년</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedSemester} onValueChange={handleSemesterChange}>
+                    <SelectTrigger className="h-11 flex-1">
+                      <SelectValue placeholder="학기" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="1">1학기</SelectItem>
+                      <SelectItem value="2">2학기</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="address" className="text-sm font-semibold">학교 주소</Label>
