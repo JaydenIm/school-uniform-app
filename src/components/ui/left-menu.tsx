@@ -10,10 +10,16 @@ const navGroups = [
   {
     label: "비즈니스 현황",
     items: [
-      { href: "/", label: "대시보드", icon: LayoutDashboard, roles: ['ADMIN', 'PARTNER'] },
-      { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER'] },
+      { href: "/", label: "대시보드", icon: LayoutDashboard, roles: ['ADMIN', 'PARTNER', 'STAFF'] },
+      { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER', 'STAFF'] },
       { href: "/schools/register", label: "학교/학생 등록", icon: UserPlus, roles: ['ADMIN', 'PARTNER'] },
       { href: "/stores", label: "매장 관리", icon: Store, roles: ['ADMIN', 'PARTNER'] },
+    ]
+  },
+  {
+    label: "직원 시스템",
+    items: [
+      { href: "/staff", label: "직원 관리", icon: UserCircle, roles: ['ADMIN', 'PARTNER'] },
     ]
   },
   {

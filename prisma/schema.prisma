@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   ADMIN
   PARTNER
+  STAFF
   STUDENT
 }
 
@@ -117,6 +118,14 @@ model Users {
   image       String?  @db.LongText               // 프로필 이미지 URL 또는 Base64
   useYn       String   @default("Y") @db.Char(1)
   role        Role     @default(PARTNER)
+  
+  // 파트너 직원 연동 시스템
+  partnerCode  String?  @unique @db.VarChar(20)    // 파트너의 고유 식별 코드
+  parentUserId Int?                              // 내부 상위 관리자 (대표) ID
+  staffStatus  String?  @default("pending") @db.VarChar(20) // pending | active | resigned
+  parentUser   Users?   @relation("StaffRelation", fields: [parentUserId], references: [id])
+  staff        Users[]  @relation("StaffRelation")
+
   createdAt   DateTime @default(now()) @updatedAt
   updatedAt   DateTime @default(now()) @updatedAt
   schools     Schools[]

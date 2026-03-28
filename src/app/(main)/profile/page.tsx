@@ -21,6 +21,8 @@ export default function ProfilePage() {
     name: '',
     phoneNumber: '',
     image: '',
+    partnerCode: '',
+    role: '',
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -39,6 +41,8 @@ export default function ProfilePage() {
             name: data.name || '',
             phoneNumber: data.phoneNumber || '',
             image: data.image || '',
+            partnerCode: data.partnerCode || '',
+            role: data.role || '',
           });
           setPreviewImage(data.image || null);
         }
@@ -203,6 +207,31 @@ export default function ProfilePage() {
                   <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
               </div>
+              {profileData.role === 'PARTNER' && profileData.partnerCode && (
+                <div className="space-y-1.5 pt-2 border-t border-gray-100 mt-2">
+                  <Label className="text-xs font-bold text-purple-600 flex items-center justify-between">
+                    직원 연동 파트너 코드
+                    <span className="text-[10px] text-gray-400 font-normal">직원 가입 시 해당 코드를 공유하세요.</span>
+                  </Label>
+                  <div className="relative">
+                    <Input 
+                      value={profileData.partnerCode} 
+                      readOnly 
+                      className="h-11 rounded-xl bg-purple-50 text-purple-900 font-mono font-bold border-purple-100 pr-20" 
+                    />
+                    <Button 
+                      variant="ghost" 
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 text-xs font-bold text-purple-700 bg-white hover:bg-purple-100 px-3"
+                      onClick={() => {
+                        navigator.clipboard.writeText(profileData.partnerCode);
+                        toast.success('파트너 코드가 복사되었습니다.');
+                      }}
+                    >
+                      복사
+                    </Button>
+                  </div>
+                </div>
+              )}
               <div className="pt-4">
                 <Button 
                   onClick={handleUpdateProfile} 

@@ -35,6 +35,7 @@ export default function SignUpPage() {
     password: '',
     confirmPassword: '',
     phoneNumber: '',
+    partnerCode: '',
   });
 
   const passwordMatch = formData.confirmPassword
@@ -126,6 +127,21 @@ export default function SignUpPage() {
             onChange={(e) => setFormData(p => ({ ...p, phoneNumber: formatPhone(e.target.value) }))}
             className="h-11"
             maxLength={13}
+          />
+        </div>
+
+        {/* 파트너 고유 코드 (선택) */}
+        <div className="space-y-1.5 pb-2 border-b border-gray-100 mb-2">
+          <Label htmlFor="partnerCode" className="text-sm font-medium text-purple-700 flex items-center gap-1">
+            소속 파트너 코드 <span className="text-xs text-gray-400 font-normal">(선택)</span>
+          </Label>
+          <Input
+            id="partnerCode"
+            type="text"
+            placeholder="직원으로 가입 시 코드 입력 (예: OFT-XXXX)"
+            value={formData.partnerCode}
+            onChange={(e) => setFormData(p => ({ ...p, partnerCode: e.target.value.toUpperCase() }))}
+            className="h-11 border-purple-200 focus:border-purple-500 bg-purple-50/30"
           />
         </div>
 

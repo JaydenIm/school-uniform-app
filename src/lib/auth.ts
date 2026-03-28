@@ -11,8 +11,9 @@ declare module "next-auth" {
         role: string;
         phoneNumber?: string;
         image?: string;
+        staffStatus?: string | null;
+        parentUserId?: number | null;
       }
-
     }
 
     interface User {
@@ -21,6 +22,8 @@ declare module "next-auth" {
       name: string;
       role: string;
       image?: string;
+      staffStatus?: string | null;
+      parentUserId?: number | null;
     }
   }
 
@@ -32,6 +35,8 @@ declare module "next-auth" {
       role: string;
       phoneNumber?: string;
       image?: string;
+      staffStatus?: string | null;
+      parentUserId?: number | null;
     }
   }
 
@@ -60,7 +65,9 @@ declare module "next-auth" {
                 name: true,
                 role: true,
                 phoneNumber: true,
-                image: true
+                image: true,
+                staffStatus: true,
+                parentUserId: true
               }
             });
 
@@ -74,7 +81,9 @@ declare module "next-auth" {
               name: user.name,
               role: user.role,
               phoneNumber: user.phoneNumber || undefined,
-              image: user.image || undefined
+              image: user.image || undefined,
+              staffStatus: user.staffStatus,
+              parentUserId: user.parentUserId
             };
           } catch (error) {
             console.error("Auth error:", error);
@@ -96,6 +105,8 @@ declare module "next-auth" {
           token.email = user.email;
           token.name = user.name;
           token.role = user.role;
+          token.staffStatus = user.staffStatus;
+          token.parentUserId = user.parentUserId;
         }
 
         // updateSession(updatedSession) 호출 시 토큰 정보도 업데이트 (최소한의 정보만)
@@ -110,6 +121,8 @@ declare module "next-auth" {
           session.user.email = token.email as string;
           session.user.name = token.name as string;
           session.user.role = token.role as string;
+          session.user.staffStatus = token.staffStatus as string | null | undefined;
+          session.user.parentUserId = token.parentUserId as number | null | undefined;
           // phoneNumber와 image는 API를 통해 별도로 가져오도록 변경
         }
         return session;

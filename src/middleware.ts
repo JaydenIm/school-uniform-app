@@ -38,10 +38,26 @@ export async function middleware(request: NextRequest) {
     }
 
     // 파트너(PARTNER) 권한 사용자는 일반적인 대시보드 및 학교 관리 가능
-    // 만약 나중에 어드민 전용 페이지(/admin)가 생긴다면 여기서 제한
     if (role === 'PARTNER') {
       if (path.startsWith('/admin')) {
         return NextResponse.redirect(new URL('/', request.url))
+      }
+    }
+
+    // 직원(STAFF) 권한 접근 제어 (승인 대기 중일 시 /pending 리다이렉트)
+    if (role === 'STAFF') {
+      const staffStatus = token.staffStatus as string | undefined;
+      const isAllowedRoute = path === '/pending' || path.startsWith('/profile');
+      
+      if (staffStatus !== 'active' && !isAllowedRoute && !path.startsWith('/api')) {
+        return NextResponse.redirect(new URL('/pending', request.url));
+      }
+
+      // 승인된 스태프라도 파트너/어드민 전용 메뉴 접근 불가
+      if (staffStatus === 'active') {
+        if (path === '/staff' || path.startsWith('/partners') || path.startsWith('/notices')) {
+           return NextResponse.redirect(new URL('/', request.url));
+        }
       }
     }
   }

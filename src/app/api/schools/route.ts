@@ -102,12 +102,26 @@ export async function POST(request: Request) {
       nextSeq = body.yearMonth + String(lastSeqNum + 1).padStart(5, '0');
     }
 
+    const user = await prisma.users.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 })
+    }
+
+    if (user.role === 'STAFF' && user.staffStatus !== 'active') {
+      return NextResponse.json({ error: '권한이 없습니다 (승인 거절 또는 대기중)' }, { status: 403 })
+    }
+
+    const effectiveUserId = user.role === 'STAFF' ? user.parentUserId! : user.id;
+
     const school = await prisma.schools.create({
       data: {
         seq: nextSeq,
         yearMonth: body.yearMonth,
         schoolName: body.schoolName,
-        userId: parseInt(session.user.id),
+        userId: effectiveUserId,
         storeId: parseInt(body.storeId), // 매장 ID 연결
         useYn: 'Y'
       }
