@@ -4,17 +4,24 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, School, ChevronRight, UserCircle, Store } from "lucide-react";
 import { AccountButton } from "./account-button";
+import { useSession } from "next-auth/react";
 
 const navItems = [
-  { href: "/", label: "대시보드", icon: LayoutDashboard },
-  { href: "/schools", label: "측정 현황 및 발송", icon: School },
-  { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight },
-  { href: "/stores", label: "매장 관리", icon: Store },
+  { href: "/", label: "대시보드", icon: LayoutDashboard, roles: ['ADMIN', 'PARTNER'] },
+  { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER'] },
+  { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight, roles: ['ADMIN', 'PARTNER'] },
+  { href: "/stores", label: "매장 관리", icon: Store, roles: ['ADMIN', 'PARTNER'] },
 ];
 
 export function LeftMenu() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || 'PARTNER';
+
+  const filteredNavItems = navItems.filter(item => 
+    !item.roles || item.roles.includes(userRole)
+  );
 
   return (
     <div className="w-64 fixed h-full flex flex-col" style={{ background: '#4B0082' }}>
@@ -31,7 +38,7 @@ export function LeftMenu() {
 
       {/* 네비게이션 */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {filteredNavItems.map(({ href, label, icon: Icon }) => {
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (
             <Link

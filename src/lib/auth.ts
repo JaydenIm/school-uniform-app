@@ -3,11 +3,12 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db";
 
 declare module "next-auth" {
-  interface Session {
+    interface Session {
       user: {
         id: string;
         email: string;
         name: string;
+        role: string;
         phoneNumber?: string;
         image?: string;
       }
@@ -18,6 +19,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       name: string;
+      role: string;
       image?: string;
     }
   }
@@ -27,6 +29,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       name: string;
+      role: string;
       phoneNumber?: string;
       image?: string;
     }
@@ -55,6 +58,7 @@ declare module "next-auth" {
                 id: true,
                 email: true,
                 name: true,
+                role: true,
                 phoneNumber: true,
                 image: true
               }
@@ -68,6 +72,7 @@ declare module "next-auth" {
               id: user.id.toString(),
               email: user.email,
               name: user.name,
+              role: user.role,
               phoneNumber: user.phoneNumber || undefined,
               image: user.image || undefined
             };
@@ -90,6 +95,7 @@ declare module "next-auth" {
           token.id = user.id;
           token.email = user.email;
           token.name = user.name;
+          token.role = user.role;
         }
 
         // updateSession(updatedSession) 호출 시 토큰 정보도 업데이트 (최소한의 정보만)
@@ -103,6 +109,7 @@ declare module "next-auth" {
           session.user.id = token.id as string;
           session.user.email = token.email as string;
           session.user.name = token.name as string;
+          session.user.role = token.role as string;
           // phoneNumber와 image는 API를 통해 별도로 가져오도록 변경
         }
         return session;
