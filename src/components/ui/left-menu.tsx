@@ -6,12 +6,23 @@ import { LayoutDashboard, School, ChevronRight, UserCircle, Store, Bell } from "
 import { AccountButton } from "./account-button";
 import { useSession } from "next-auth/react";
 
-const navItems = [
-  { href: "/", label: "대시보드", icon: LayoutDashboard, roles: ['ADMIN', 'PARTNER'] },
-  { href: "/notices", label: "전체공지 관리", icon: Bell, roles: ['ADMIN'] },
-  { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER'] },
-  { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight, roles: ['ADMIN', 'PARTNER'] },
-  { href: "/stores", label: "매장 관리", icon: Store, roles: ['ADMIN', 'PARTNER'] },
+const navGroups = [
+  {
+    label: "비즈니스 현황",
+    items: [
+      { href: "/", label: "대시보드", icon: LayoutDashboard, roles: ['ADMIN', 'PARTNER'] },
+      { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER'] },
+      { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight, roles: ['ADMIN', 'PARTNER'] },
+      { href: "/stores", label: "매장 관리", icon: Store, roles: ['ADMIN', 'PARTNER'] },
+    ]
+  },
+  {
+    label: "시스템 관리",
+    items: [
+      { href: "/notices", label: "전체공지 관리", icon: Bell, roles: ['ADMIN'] },
+      { href: "/partners", label: "파트너 관리", icon: UserCircle, roles: ['ADMIN'] },
+    ]
+  }
 ];
 
 export function LeftMenu() {
@@ -19,10 +30,6 @@ export function LeftMenu() {
   const router = useRouter();
   const { data: session } = useSession();
   const userRole = session?.user?.role || 'PARTNER';
-
-  const filteredNavItems = navItems.filter(item => 
-    !item.roles || item.roles.includes(userRole)
-  );
 
   return (
     <div className="w-64 fixed h-full flex flex-col" style={{ background: '#4B0082' }}>
@@ -38,23 +45,38 @@ export function LeftMenu() {
       </button>
 
       {/* 네비게이션 */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {filteredNavItems.map(({ href, label, icon: Icon }) => {
-          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto custom-scrollbar">
+        {navGroups.map((group, groupIdx) => {
+          const filteredItems = group.items.filter(item => 
+            !item.roles || item.roles.includes(userRole)
+          );
+          
+          if (filteredItems.length === 0) return null;
+
           return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
-                ${isActive
-                  ? 'bg-white/20 text-white shadow-inner'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className="flex-1">{label}</span>
-              {isActive && <ChevronRight className="w-3 h-3 opacity-60" />}
-            </Link>
+            <div key={groupIdx} className="space-y-1">
+              <p className="px-3 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
+                {group.label}
+              </p>
+              {filteredItems.map(({ href, label, icon: Icon }) => {
+                const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
+                      ${isActive
+                        ? 'bg-white/20 text-white shadow-inner'
+                        : 'text-white/70 hover:bg-white/10 hover:text-white'
+                      }`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="flex-1">{label}</span>
+                    {isActive && <ChevronRight className="w-3 h-3 opacity-60" />}
+                  </Link>
+                );
+              })}
+            </div>
           );
         })}
       </nav>
