@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,9 +11,11 @@ import { Input } from "@/components/ui/input";
 
 export default function NoticesPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [notices, setNotices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+ Aurora:
 
   useEffect(() => {
     fetchNotices();
@@ -38,7 +41,7 @@ export default function NoticesPage() {
   );
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8 w-full">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-purple-600 font-bold mb-1">
@@ -48,12 +51,14 @@ export default function NoticesPage() {
           <h1 className="text-4xl font-black text-gray-900 tracking-tight">파트너 공지사항</h1>
           <p className="text-gray-500 font-medium text-lg">온핏 파트너 분들을 위한 중요 공지 및 시스템 업데이트 소식입니다.</p>
         </div>
-        <Button 
-          className="bg-purple-800 text-white rounded-2xl h-14 px-8 font-bold hover:bg-purple-900 shadow-xl shadow-purple-200 transition-all hover:scale-105"
-          onClick={() => router.push('/notices/write')}
-        >
-          <Plus className="mr-2 w-5 h-5" /> 새 공지 작성
-        </Button>
+        {session?.user?.role === 'ADMIN' && (
+          <Button 
+            className="bg-purple-800 text-white rounded-2xl h-14 px-8 font-bold hover:bg-purple-900 shadow-xl shadow-purple-200 transition-all hover:scale-105"
+            onClick={() => router.push('/notices/write')}
+          >
+            <Plus className="mr-2 w-5 h-5" /> 새 공지 작성
+          </Button>
+        )}
       </div>
 
       <div className="relative">

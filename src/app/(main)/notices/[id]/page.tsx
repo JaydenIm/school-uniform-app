@@ -35,7 +35,7 @@ export default function NoticeDetailPage({ params }: { params: { id: string } })
 
   if (isLoading) {
     return (
-      <div className="p-8 max-w-4xl mx-auto space-y-8 animate-pulse">
+      <div className="max-w-4xl mx-auto space-y-8 w-full animate-pulse">
         <div className="h-8 bg-gray-100 rounded-full w-48" />
         <div className="h-20 bg-gray-100 rounded-3xl" />
         <div className="h-[500px] bg-gray-50 rounded-[3rem]" />
@@ -44,7 +44,7 @@ export default function NoticeDetailPage({ params }: { params: { id: string } })
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 w-full">
       <div className="flex items-center justify-between">
         <Button 
           variant="ghost" 

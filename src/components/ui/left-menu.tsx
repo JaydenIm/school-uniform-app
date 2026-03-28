@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, School, ChevronRight, UserCircle, Store } from "lucide-react";
+import { LayoutDashboard, School, ChevronRight, UserCircle, Store, Bell } from "lucide-react";
 import { AccountButton } from "./account-button";
 import { useSession } from "next-auth/react";
 
 const navItems = [
   { href: "/", label: "대시보드", icon: LayoutDashboard, roles: ['ADMIN', 'PARTNER'] },
+  { href: "/notices", label: "전체공지 관리", icon: Bell, roles: ['ADMIN'] },
   { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER'] },
   { href: "/schools/register", label: "학교/학생 등록", icon: ChevronRight, roles: ['ADMIN', 'PARTNER'] },
   { href: "/stores", label: "매장 관리", icon: Store, roles: ['ADMIN', 'PARTNER'] },

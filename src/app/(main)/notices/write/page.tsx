@@ -45,7 +45,7 @@ export default function NoticeWritePage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 w-full">
       <div className="flex items-center justify-between">
         <Button 
           variant="ghost" 

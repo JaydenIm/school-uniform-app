@@ -280,7 +280,7 @@ export default function CreateSchool() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl relative">
+    <div className="max-w-5xl mx-auto relative w-full">
       {/* 성공 오버레이 */}
       {showSuccessOverlay && (
         <div className="fixed inset-0 bg-white/80 backdrop-blur-md z-50 flex flex-col items-center justify-center animate-in fade-in duration-500">

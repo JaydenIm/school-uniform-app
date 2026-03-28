@@ -91,7 +91,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex-1 space-y-6 p-8 bg-gray-50/50">
+    <div className="flex-1 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -126,9 +126,11 @@ export default function DashboardPage() {
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-gray-600 font-bold border-gray-200 rounded-lg" onClick={() => router.push('/notices/write')}>
-                공지 작성
-              </Button>
+              {session?.user?.role === 'ADMIN' && (
+                <Button variant="outline" size="sm" className="text-gray-600 font-bold border-gray-200 rounded-lg" onClick={() => router.push('/notices/write')}>
+                  공지 작성
+                </Button>
+              )}
               <Button variant="ghost" size="sm" className="text-purple-600 font-bold hover:bg-purple-50 group" onClick={() => router.push('/notices')}>
                 전체 보기 <ChevronRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Button>
@@ -171,9 +173,11 @@ export default function DashboardPage() {
                   )) : (
                     <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
                       <p className="font-medium">등록된 공지사항이 없습니다.</p>
-                      <Button variant="ghost" size="sm" className="mt-4 text-purple-600" onClick={() => router.push('/notices/write')}>
-                        첫 번째 공지 작성하기
-                      </Button>
+                      {session?.user?.role === 'ADMIN' && (
+                        <Button variant="ghost" size="sm" className="mt-4 text-purple-600" onClick={() => router.push('/notices/write')}>
+                          첫 번째 공지 작성하기
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>

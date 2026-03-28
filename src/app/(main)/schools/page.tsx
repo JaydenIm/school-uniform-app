@@ -196,7 +196,7 @@ export default function SchoolsPage() {
   const selectedSchool = schools.find(s => s.id === selectedSchoolId);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 w-full">
       {/* Breadcrumbs */}
       <nav className="flex text-sm text-gray-500" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-1">
