@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, School, ChevronRight, UserCircle, Store, Bell, UserPlus, FileSpreadsheet } from "lucide-react";
+import { LayoutDashboard, School, ChevronRight, UserCircle, Store, Bell, UserPlus, FileSpreadsheet, Gavel } from "lucide-react";
 import { AccountButton } from "./account-button";
 import { useSession } from "next-auth/react";
 
@@ -15,6 +15,7 @@ const navGroups = [
       { href: "/schools", label: "측정 현황 및 발송", icon: School, roles: ['ADMIN', 'PARTNER', 'STAFF'] },
       { href: "/schools/register", label: "학교/학생 등록", icon: UserPlus, roles: ['ADMIN', 'PARTNER'] },
       { href: "/stores", label: "매장 관리", icon: Store, roles: ['ADMIN', 'PARTNER'] },
+      { href: "/notices/keywords", label: "입찰 키워드 설정", icon: Gavel, roles: ['ADMIN', 'PARTNER', 'STAFF'] },
     ]
   },
   {

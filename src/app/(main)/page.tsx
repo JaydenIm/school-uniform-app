@@ -19,7 +19,8 @@ import {
   ClipboardList,
   ChevronRight,
   TrendingUp,
-  LayoutDashboard
+  LayoutDashboard,
+  Settings
 } from "lucide-react";
 
 interface NaraBid {
@@ -203,9 +204,22 @@ export default function DashboardPage() {
                    </div>
                  ))
                )}
-               <Button variant="ghost" className="w-full mt-2 h-10 text-xs font-bold text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl" onClick={() => window.open('https://www.g2b.go.kr', '_blank')}>
-                  나라장터 바로가기
-               </Button>
+               <div className="flex gap-2 mt-2">
+                 <Button 
+                   variant="ghost" 
+                   className="flex-1 h-10 text-xs font-bold text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl flex items-center gap-2" 
+                   onClick={() => router.push('/notices/keywords')}
+                 >
+                   <Settings className="w-3.5 h-3.5" /> 키워드 설정
+                 </Button>
+                 <Button 
+                   variant="ghost" 
+                   className="flex-1 h-10 text-xs font-bold text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl" 
+                   onClick={() => window.open('https://www.g2b.go.kr', '_blank')}
+                 >
+                   나라장터 바로가기
+                 </Button>
+               </div>
             </CardContent>
           </Card>
 
